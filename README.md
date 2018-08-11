@@ -1,5 +1,5 @@
 # Hovercraft Velocity Solver
-This Java application runs a numerical solver of a Riccati differential equation to solve for the velocity of a hovercraft as a function of time. Computation is facilitated by the Apache Math library; graphing is facilitated by the JFreeChart library (which itself uses JCommon); testing is done using JUnit. Users interact through a basic GUI written in Swing.
+This Java application runs a numerical solver of a Riccati differential equation to solve for the velocity of a hovercraft as a function of time. Computation is facilitated by the Apache Math library; graphing is facilitated by the JFreeChart library (which itself uses JCommon); testing is done using TestNG. Users interact through a basic GUI written in Swing.
 
 This project was created as a supplement to the research paper "Thrust Analysis of a non-Integrated Hovercraft" by Benjamin D. Zalla. Snippets of code from this project are included in the paper, and a link to this repository is given in it as well.
 
