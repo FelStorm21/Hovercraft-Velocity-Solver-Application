@@ -6,3 +6,4 @@ This project was created as a supplement to the research paper "Thrust Analysis 
 The entire Eclipse project is included for import. Note that if you have Presonus Studio One installed on your computer, the Eclipse .project file will have the same file extension as a Studio One .project. This shouldn't affect the functionality, as long as you do not rename the file.
 
 The executable and jar files can be found within the "target" directory. Both the .jar and .exe files are exactly the same application, with the .exe version being created using launch4j software to wrap the .jar into an .exe. The .exe comes with a basic desktop thumbnail for ease of access.
+ 
