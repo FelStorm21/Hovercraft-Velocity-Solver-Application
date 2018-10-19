@@ -541,9 +541,7 @@ public class GUI {
 	
 //set up all the action listeners
 		
-		c_zeroInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		c_zeroInput.addActionListener((e) -> {
 				c_zeroString = c_zeroInput.getText().replaceAll(" Enter number: ", "");
 				c_zeroPrimeString = c_zeroString;
 				boolean inError = false;
@@ -574,13 +572,10 @@ public class GUI {
 				if (autoUpdateBox.isSelected()) {
 					updateGraph();
 				}					
-			}
 			
 		});
 
-		c_oneInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		c_oneInput.addActionListener((e) -> {
 				c_oneString = c_oneInput.getText().replaceAll(" Enter number: ", "");
 				c_onePrimeString = c_oneString;
 				boolean inError = false;
@@ -611,13 +606,10 @@ public class GUI {
 				if (autoUpdateBox.isSelected()) {
 					updateGraph();
 				}					
-			}
 			
 		});
 
-		c_twoInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		c_twoInput.addActionListener((e) -> {
 				c_twoString = c_twoInput.getText().replaceAll(" Enter number: ", "");
 				c_twoPrimeString = c_twoString;
 				boolean inError = false;
@@ -648,13 +640,10 @@ public class GUI {
 				if (autoUpdateBox.isSelected()) {
 					updateGraph();
 				}					
-			}
 			
 		});
 		
-		c_threeInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		c_threeInput.addActionListener((e) -> {
 				c_threeString = c_threeInput.getText().replaceAll(" Retry: ", "");
 				boolean inError = false;
 				try {
@@ -679,13 +668,10 @@ public class GUI {
 				if (autoUpdateBox.isSelected()) {
 					updateGraph();
 				}					
-			}
 			
 		});
 		
-		c_fourInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		c_fourInput.addActionListener((e) -> {
 				c_fourString = c_fourInput.getText().replaceAll(" Retry: ", "");
 				boolean inError = false;
 				try {
@@ -710,13 +696,9 @@ public class GUI {
 				if (autoUpdateBox.isSelected()) {
 					updateGraph();
 				}					
-			}
-			
 		});
 		
-		c_fiveInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		c_fiveInput.addActionListener((e) -> {
 				c_fiveString = c_fiveInput.getText().replaceAll(" Retry: ", "");
 				boolean inError = false;
 				try {
@@ -741,13 +723,10 @@ public class GUI {
 				if (autoUpdateBox.isSelected()) {
 					updateGraph();
 				}					
-			}
 			
 		});
 		
-		smoothingFactorInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		smoothingFactorInput.addActionListener((e) -> {
 				int smoothingFactorOld = smoothingFactor;
 				boolean inError = false;
 				try {
@@ -769,7 +748,6 @@ public class GUI {
 					updateGraph();
 				}
 				propertyChangeSupport.firePropertyChange("smoothingFactorEntered", smoothingFactorOld, smoothingFactor);
-			}
 			
 		});
 		
@@ -789,13 +767,11 @@ public class GUI {
 			
 		});
 		
-		propertyChangeSupport.addPropertyChangeListener("smoothingFactorEntered", new PropertyChangeListener() {
-
-			@Override public void propertyChange(PropertyChangeEvent evt) {
-				smoothingFactorEntered = true;
-			}
+		propertyChangeSupport.addPropertyChangeListener("smoothingFactorEntered", (evt) ->
+				smoothingFactorEntered = true
 			
-		});
+			
+		);
 		
 		smoothingFactorInput.addFocusListener(new FocusListener() {
 
@@ -815,9 +791,7 @@ public class GUI {
 			
 		});
 		
-		maxAngleInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		maxAngleInput.addActionListener((e) -> {
 				double maxAngleOld = smoother.getMaxAngle();
 				boolean inError = false;
 				try {
@@ -839,7 +813,6 @@ public class GUI {
 					updateGraph();
 				}
 				propertyChangeSupport.firePropertyChange("maxAngleEntered", maxAngleOld, smoother.getMaxAngle());
-			}
 			
 		});
 		
@@ -860,13 +833,8 @@ public class GUI {
 			
 		});
 		
-		propertyChangeSupport.addPropertyChangeListener("maxAngleEntered", new PropertyChangeListener() {
-
-			@Override public void propertyChange(PropertyChangeEvent evt) {
-				maxAngleEntered = true;
-			}
-			
-		});
+		propertyChangeSupport.addPropertyChangeListener("maxAngleEntered", (evt) ->
+				maxAngleEntered = true);
 		
 		maxAngleInput.addFocusListener(new FocusListener() {
 
@@ -886,17 +854,9 @@ public class GUI {
 			
 		});
 
-		manualUpdateButton.addActionListener(new ActionListener() {
+		manualUpdateButton.addActionListener((e) -> updateGraph());
 
-			@Override public void actionPerformed(ActionEvent e) {
-				updateGraph();
-			}	
-			
-		});
-
-		tMinInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		tMinInput.addActionListener((e) -> {
 				graph.setMinCounter(graph.getMinCounter() + 1);
 				closedFormGraph.setMinCounter(closedFormGraph.getMinCounter() + 1);
 				boolean inError = false;
@@ -922,13 +882,10 @@ public class GUI {
 				if (autoUpdateBox.isSelected()) {
 					updateGraph();
 				}
-			}
 			
 		});
 
-		tMaxInput.addActionListener(new ActionListener() {
-
-			@Override public void actionPerformed(ActionEvent e) {
+		tMaxInput.addActionListener((e) -> {
 				graph.setMaxCounter(graph.getMaxCounter() + 1);
 				closedFormGraph.setMaxCounter(closedFormGraph.getMaxCounter() + 1);
 				boolean inError = false;
@@ -954,13 +911,10 @@ public class GUI {
 				if (autoUpdateBox.isSelected()) {
 					updateGraph();
 				}	
-			}
 			
 		});
 
-		graphBox.addActionListener(new ActionListener() {   
-
-			@Override public void actionPerformed(ActionEvent e) {
+		graphBox.addActionListener((e) -> {
 				graph.setCheckCounter(graph.getCheckCounter() + 1);
 				if (graph.getMaxCounter() == 0  & graph.getMinCounter() == 0) {
 					rhandler.setTmin(0);
@@ -1003,34 +957,24 @@ public class GUI {
 					graph.getChartFrame().dispose();
 					graph.setCheckCounter(graph.getCheckCounter() + 1);
 				}
-			}
 			
 		});
 		
 		
-		graph.getPropertyChangeSupport().addPropertyChangeListener(new PropertyChangeListener() {
-
-			@Override public void propertyChange(PropertyChangeEvent evt) {
+		graph.getPropertyChangeSupport().addPropertyChangeListener((evt) -> {
 				if (evt.getPropertyName().equals("graphClosed")) {
 					graphBox.setSelected(false);
 					graph.setCheckCounter(graph.getCheckCounter() + 1);
 					graph.setLastLocation(graph.getChartFrame().getLocation());
 				}
-			}
 			
 		});
 		
-		closedFormFunction.getPropertyChangeSupport().addPropertyChangeListener("nanExceptionThrown", new PropertyChangeListener() {
-
-			@Override public void propertyChange(PropertyChangeEvent evt) {
+		closedFormFunction.getPropertyChangeSupport().addPropertyChangeListener("nanExceptionThrown", (evt) -> {
 				closedFormExceptionDialog.setVisible(true);
-			}
-			
 		});
 		
-		closedFormGraphBox.addActionListener(new ActionListener() {   
-
-			@Override public void actionPerformed(ActionEvent e) {
+		closedFormGraphBox.addActionListener((e) -> {
 				closedFormGraph.setCheckCounter(closedFormGraph.getCheckCounter() + 1);
 				if (closedFormGraph.getMaxCounter() == 0  & closedFormGraph.getMinCounter() == 0) {
 					closedFormGraph.settMin(0);
@@ -1062,8 +1006,6 @@ public class GUI {
 					closedFormGraph.getChartFrame().dispose();
 					closedFormGraph.setCheckCounter(closedFormGraph.getCheckCounter() + 1);
 				}
-			}
-			
 		});
 		
 		closedFormGraph.getPcs().addPropertyChangeListener(new PropertyChangeListener() {
