@@ -1,4 +1,5 @@
 package vmamakers.hcSolverApp;
+
 import java.awt.Point;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -15,7 +16,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 public class RiccatiGraph {
-	
+
 	private double tmin = 0;
 	private double tmax = 120;
 	private RiccatiSolver solver;
@@ -29,13 +30,13 @@ public class RiccatiGraph {
 	private XYSeries series;
 	private XYSeriesCollection dataset;
 	private JFreeChart chart;
-	
+
 	protected PropertyChangeSupport propertyChangeSupport;
-	
-	public RiccatiGraph() {    //default constructor that sets interval to two minutes long
+
+	public RiccatiGraph() { //default constructor that sets interval to two minutes long
 		propertyChangeSupport = new PropertyChangeSupport(this);
 	}
-	
+
 	public void plot() {
 		series = new XYSeries("Predicted");
 		for (Map.Entry<Double, Double> entry : graphData.entrySet()) {
@@ -48,31 +49,42 @@ public class RiccatiGraph {
 		chartFrame.setSize(500, 500);
 		chartFrame.setLocationRelativeTo(mainPanel);
 		chartFrame.setVisible(true);
-		
+
 		chartFrame.addWindowListener(new WindowListener() {
 
-			@Override public void windowOpened(WindowEvent e) {}
-			@Override public void windowClosing(WindowEvent e) {}
+			@Override
+			public void windowOpened(WindowEvent e) {}
 
-			@Override public void windowClosed(WindowEvent e) {
+			@Override
+			public void windowClosing(WindowEvent e) {}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
 				propertyChangeSupport.firePropertyChange("graphClosed", false, true);
 			}
 
-			@Override public void windowIconified(WindowEvent e) {}
-			@Override public void windowDeiconified(WindowEvent e) {}
-			@Override public void windowActivated(WindowEvent e) {}
-			@Override public void windowDeactivated(WindowEvent e) {}
-			
+			@Override
+			public void windowIconified(WindowEvent e) {}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {}
+
+			@Override
+			public void windowActivated(WindowEvent e) {}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {}
+
 		});
 	}
-	
+
 	public void updateDataset() {
 		series.clear();
 		for (Map.Entry<Double, Double> entry : graphData.entrySet()) {
 			series.add(entry.getKey(), entry.getValue());
 		}
-	}	
-	
+	}
+
 	public double getTmin() {
 		return tmin;
 	}
@@ -185,4 +197,3 @@ public class RiccatiGraph {
 		this.propertyChangeSupport = propertyChangeSupport;
 	}
 }
-
