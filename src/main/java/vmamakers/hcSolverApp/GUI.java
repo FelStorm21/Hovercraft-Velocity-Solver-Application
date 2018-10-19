@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 
 import org.apache.commons.math3.exception.NotANumberException;
 import org.apache.commons.math3.exception.NumberIsTooSmallException;
@@ -202,6 +203,10 @@ public class GUI {
 	
 
 	public GUI() {
+		SwingUtilities.invokeLater(this::initGui);
+	}
+	
+	private void initGui() {
 		
 // set up all the objects we need to integrate into the gui	
 		
