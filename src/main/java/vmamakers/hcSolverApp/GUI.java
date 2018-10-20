@@ -3,8 +3,6 @@ package vmamakers.hcSolverApp;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
@@ -12,6 +10,8 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -38,26 +38,12 @@ public class GUI {
 	private RiccatiGraph graph;
 	private RiccatiHandler rhandler;
 	private RiccatiSmoother smoother;
-	@SuppressWarnings("unused") private ClosedFormFunction closedFormFunction;
+	private @SuppressWarnings("unused") ClosedFormFunction closedFormFunction;
 	private ClosedFormGraph closedFormGraph;
 
-	private final static String SUB_ZERO = "\u2080";
-	private final static String SUB_ONE = "\u2081";
-	private final static String SUB_TWO = "\u2082";
-	private final static String SUB_THREE = "\u2083";
-	private final static String SUB_FOUR = "\u2084";
-	private final static String SUB_FIVE = "\u2085";
-
-	private String c_zeroString = "c" + SUB_ZERO;
-	private String c_oneString = "c" + SUB_ONE;
-	private String c_twoString = "c" + SUB_TWO;
-	private String c_threeString = "c" + SUB_THREE;
-	private String c_fourString = "c" + SUB_FOUR;
-	private String c_fiveString = "c" + SUB_FIVE;
-
-	private String c_zeroPrimeString = "c" + SUB_ZERO + "'";
-	private String c_onePrimeString = "c" + SUB_ONE + "'";
-	private String c_twoPrimeString = "c" + SUB_TWO + "'";
+	private static final String[] SUB_CHARS = { "\u2080", "\u2081", "\u2082", "\u2083", "\u2084", "\u2085" };
+	private String[] inputStrings;
+	private String[] primeStrings = new String[3];
 
 	private double result;
 	private double cfResult;
@@ -77,6 +63,14 @@ public class GUI {
 	boolean maxAngleEntered = false;
 
 	private int dragCoeffCounter = 0;
+
+	public GUI() {
+		inputStrings = Arrays.stream(SUB_CHARS).map(sub -> "c" + sub).collect(Collectors.toList()).toArray(new String[0]);
+		for (int i = 0; i < 3; i++) {
+			primeStrings[i] = "c" + SUB_CHARS[i] + "'";
+		}
+		SwingUtilities.invokeLater(this::initGui);
+	}
 
 	public void updateGraph() {
 		try {
@@ -198,10 +192,6 @@ public class GUI {
 		}
 	}
 
-	public GUI() {
-		SwingUtilities.invokeLater(this::initGui);
-	}
-
 	private void initGui() {
 
 		// set up all the objects we need to integrate into the gui	
@@ -249,51 +239,35 @@ public class GUI {
 
 		JLabel displayLabel = new JLabel("This is the equation we are solving:");
 		displayPanel.add(displayLabel);
-		JLabel equationLabel = new JLabel("v'(t) = " + c_zeroString + " - " + c_oneString + " [v(t)] - " + c_twoString + " [v(t)]^2");
+		JLabel equationLabel = new JLabel("v'(t) = " + inputStrings[0] + " - " + inputStrings[1] + " [v(t)] - " + inputStrings[2] + " [v(t)]^2");
 		displayPanel.add(equationLabel);
 		frame.add(displayPanel, BorderLayout.NORTH);
 
 		Dimension d = new Dimension(150, 5);
 
-		JTextField c_zeroInput = new JTextField(10);
-		JTextField c_oneInput = new JTextField(10);
-		JTextField c_twoInput = new JTextField(10);
-		JTextField c_threeInput = new JTextField(5);
-		JTextField c_fourInput = new JTextField(5);
-		JTextField c_fiveInput = new JTextField(5);
+		JTextField[] inputs = new JTextField[6];
+		JLabel[] inputLabels = new JLabel[6];
+		for (int i = 0; i < 6; i++) {
+			JTextField input = i <= 2 ? new JTextField(10) : new JTextField(5);
+			input.setMaximumSize(d);
+			inputLabels[i] = new JLabel(inputStrings[i] + " = ");
+			inputs[i] = input;
+		}
+
 		JTextField tInput = new JTextField(10);
 		JTextField smoothingFactorInput = new JTextField(10);
 		JTextField maxAngleInput = new JTextField(10);
+		Arrays.asList(smoothingFactorInput, maxAngleInput, tInput).forEach((input) -> {
+			input.setMaximumSize(d);
+			input.setForeground(Color.gray);
+		});
 
-		c_zeroInput.setMaximumSize(d);
-		JLabel c_zeroLabel = new JLabel(c_zeroString + " = ");
-
-		c_oneInput.setMaximumSize(d);
-		JLabel c_oneLabel = new JLabel(c_oneString + " = ");
-
-		c_twoInput.setMaximumSize(d);
-		JLabel c_twoLabel = new JLabel(c_twoString + " = ");
-
-		c_threeInput.setMaximumSize(d);
-		JLabel c_threeLabel = new JLabel(c_threeString + " = ");
-
-		c_fourInput.setMaximumSize(d);
-		JLabel c_fourLabel = new JLabel(c_fourString + " = ");
-
-		c_fiveInput.setMaximumSize(d);
-		JLabel c_fiveLabel = new JLabel(c_fiveString + " = ");
-
-		smoothingFactorInput.setMaximumSize(d);
 		JLabel smoothingFactorLabel = new JLabel("Smoothing factor:");
-		smoothingFactorInput.setForeground(Color.gray);
 		smoothingFactorInput.setText(" (Default = 8)");
 
-		maxAngleInput.setMaximumSize(d);
 		JLabel maxAngleLabel = new JLabel("Max angle:");
-		maxAngleInput.setForeground(Color.gray);
 		maxAngleInput.setText(" (Default = 10\u00b0)");
 
-		tInput.setMaximumSize(d);
 		JLabel tLabel = new JLabel("Enter value of t: ");
 
 		JCheckBox graphBox = new JCheckBox("Show graph?");
@@ -334,24 +308,21 @@ public class GUI {
 		layout2.setAutoCreateContainerGaps(true);
 
 		GroupLayout.SequentialGroup hgroup2 = layout2.createSequentialGroup();
-		hgroup2.addGroup(layout2.createParallelGroup().addComponent(tMinLabel).addComponent(tMaxLabel).addComponent(c_threeLabel).addComponent(c_fourLabel).addComponent(c_fiveLabel));
-		hgroup2.addGroup(layout2.createParallelGroup().addComponent(tMinInput).addComponent(tMaxInput).addComponent(c_threeInput).addComponent(c_fourInput).addComponent(c_fiveInput));
+		hgroup2.addGroup(layout2.createParallelGroup().addComponent(tMinLabel).addComponent(tMaxLabel).addComponent(inputLabels[3]).addComponent(inputLabels[4]).addComponent(inputLabels[5]));
+		hgroup2.addGroup(layout2.createParallelGroup().addComponent(tMinInput).addComponent(tMaxInput).addComponent(inputs[3]).addComponent(inputs[4]).addComponent(inputs[5]));
 		layout2.setHorizontalGroup(hgroup2);
 
 		GroupLayout.SequentialGroup vgroup2 = layout2.createSequentialGroup();
 		vgroup2.addGroup(layout2.createParallelGroup().addComponent(tMinLabel).addComponent(tMinInput));
 		vgroup2.addGroup(layout2.createParallelGroup().addComponent(tMaxLabel).addComponent(tMaxInput));
-		vgroup2.addGroup(layout2.createParallelGroup().addComponent(c_threeLabel).addComponent(c_threeInput));
-		vgroup2.addGroup(layout2.createParallelGroup().addComponent(c_fourLabel).addComponent(c_fourInput));
-		vgroup2.addGroup(layout2.createParallelGroup().addComponent(c_fiveLabel).addComponent(c_fiveInput));
+		vgroup2.addGroup(layout2.createParallelGroup().addComponent(inputLabels[3]).addComponent(inputs[3]));
+		vgroup2.addGroup(layout2.createParallelGroup().addComponent(inputLabels[4]).addComponent(inputs[4]));
+		vgroup2.addGroup(layout2.createParallelGroup().addComponent(inputLabels[5]).addComponent(inputs[5]));
 		layout2.setVerticalGroup(vgroup2);
 
-		c_threeLabel.setVisible(false);
-		c_threeInput.setVisible(false);
-		c_fourLabel.setVisible(false);
-		c_fourInput.setVisible(false);
-		c_fiveLabel.setVisible(false);
-		c_fiveInput.setVisible(false);
+		for (int i = 3; i < inputLabels.length; i++) {
+			inputLabels[i].setVisible(false);
+		}
 
 		JDialog closedFormExceptionDialog = new JDialog();
 		closedFormExceptionDialog.setSize(680, 140);
@@ -467,14 +438,14 @@ public class GUI {
 		layout.setAutoCreateContainerGaps(true);
 
 		GroupLayout.SequentialGroup hgroup = layout.createSequentialGroup();
-		hgroup.addGroup(layout.createParallelGroup(Alignment.TRAILING).addComponent(c_zeroLabel).addComponent(c_oneLabel).addComponent(c_twoLabel).addComponent(tLabel).addComponent(smoothingFactorLabel).addComponent(maxAngleLabel).addComponent(checkPanel));
-		hgroup.addGroup(layout.createParallelGroup().addComponent(c_zeroInput).addComponent(c_oneInput).addComponent(c_twoInput).addComponent(tInput).addComponent(smoothingFactorInput).addComponent(maxAngleInput).addComponent(graphBoxPanel));
+		hgroup.addGroup(layout.createParallelGroup(Alignment.TRAILING).addComponent(inputLabels[0]).addComponent(inputLabels[1]).addComponent(inputLabels[2]).addComponent(tLabel).addComponent(smoothingFactorLabel).addComponent(maxAngleLabel).addComponent(checkPanel));
+		hgroup.addGroup(layout.createParallelGroup().addComponent(inputs[0]).addComponent(inputs[1]).addComponent(inputs[2]).addComponent(tInput).addComponent(smoothingFactorInput).addComponent(maxAngleInput).addComponent(graphBoxPanel));
 		layout.setHorizontalGroup(hgroup);
 
 		GroupLayout.SequentialGroup vgroup = layout.createSequentialGroup();
-		vgroup.addGroup(layout.createParallelGroup().addComponent(c_zeroLabel).addComponent(c_zeroInput));
-		vgroup.addGroup(layout.createParallelGroup().addComponent(c_oneLabel).addComponent(c_oneInput));
-		vgroup.addGroup(layout.createParallelGroup().addComponent(c_twoLabel).addComponent(c_twoInput));
+		vgroup.addGroup(layout.createParallelGroup().addComponent(inputLabels[0]).addComponent(inputs[0]));
+		vgroup.addGroup(layout.createParallelGroup().addComponent(inputLabels[1]).addComponent(inputs[1]));
+		vgroup.addGroup(layout.createParallelGroup().addComponent(inputLabels[2]).addComponent(inputs[2]));
 		vgroup.addGroup(layout.createParallelGroup().addComponent(tLabel).addComponent(tInput));
 		vgroup.addGroup(layout.createParallelGroup().addComponent(smoothingFactorLabel).addComponent(smoothingFactorInput));
 		vgroup.addGroup(layout.createParallelGroup().addComponent(maxAngleLabel).addComponent(maxAngleInput));
@@ -487,181 +458,54 @@ public class GUI {
 
 		//set up all the action listeners
 
-		c_zeroInput.addActionListener((e) -> {
-			c_zeroString = c_zeroInput.getText().replaceAll(" Enter number: ", "");
-			c_zeroPrimeString = c_zeroString;
-			boolean inError = false;
-			try {
-				c_zeroInput.setForeground(Color.black);
-				if (Double.parseDouble(c_zeroInput.getText().replaceAll(" Enter number: ", "")) < 0) {
-					throw new NumberFormatException();
+		for (int index = 0; index < inputs.length; index++) {
+			final int i = index;
+			JTextField input = inputs[i];
+			input.addActionListener((e) -> {
+				inputStrings[i] = input.getText().replaceAll(i < 3 ? " Enter number: " : " Retry: ", "");
+				if (i < 3) {
+					primeStrings[i] = inputStrings[i];
 				}
-				solver.setC_zero(Double.parseDouble(c_zeroInput.getText().replaceAll(" Enter number: ", "")));
-				closedFormFunction.setChi(Double.parseDouble(c_zeroInput.getText().replaceAll(" Enter number: ", "")));
-				c_zeroInput.setText("");
-			} catch (NumberFormatException e4) {
-				c_zeroInput.setForeground(Color.red);
-				c_zeroInput.setText(" Enter number: ");
-				inError = true;
-			}
-
-			if (dragCoeffBox.isSelected()) {
-				equationLabel.setText("v'(t) = " + c_zeroPrimeString + " - " + c_onePrimeString + " [v(t)] - " + c_twoPrimeString + " [v(t)]^2 - " + "(" + c_threeString + " exp(-" + c_fourString + " v(t)) + " + c_fiveString + ")[v(t)]^2");
-			} else {
-				equationLabel.setText("v'(t) = " + c_zeroString + " - " + c_oneString + " [v(t)] - " + c_twoString + " [v(t)]^2");
-			}
-			if (!inError) {
-				c_oneInput.requestFocus();
-			}
-			if (autoUpdateBox.isSelected()) {
-				updateGraph();
-			}
-
-		});
-
-		c_oneInput.addActionListener((e) -> {
-			c_oneString = c_oneInput.getText().replaceAll(" Enter number: ", "");
-			c_onePrimeString = c_oneString;
-			boolean inError = false;
-			try {
-				c_oneInput.setForeground(Color.black);
-				if (Double.parseDouble(c_oneInput.getText().replaceAll(" Enter number: ", "")) < 0) {
-					throw new NumberFormatException();
+				boolean inError = false;
+				try {
+					input.setForeground(Color.black);
+					double value = Double.parseDouble(input.getText().replaceAll(i < 3 ? " Enter number: " : " Retry: ", ""));
+					if (value < 0) {
+						throw new NumberFormatException();
+					}
+					if (i < 3) {
+						solver.setConstant(i, value);
+						closedFormFunction.setValue(i, value);
+					} else {
+						solver.setCoeff(i - 3, value);
+					}
+					input.setText("");
+				} catch (NumberFormatException e4) {
+					input.setForeground(Color.red);
+					input.setText(i < 3 ? " Enter number: " : " Retry: ");
+					inError = true;
 				}
-				solver.setC_one(Double.parseDouble(c_oneInput.getText().replaceAll(" Enter number: ", "")));
-				closedFormFunction.setPhi(Double.parseDouble(c_oneInput.getText().replaceAll(" Enter number: ", "")));
-				c_oneInput.setText("");
-			} catch (NumberFormatException e4) {
-				c_oneInput.setForeground(Color.red);
-				c_oneInput.setText(" Enter number: ");
-				inError = true;
-			}
-
-			if (dragCoeffBox.isSelected()) {
-				equationLabel.setText("v'(t) = " + c_zeroPrimeString + " - " + c_onePrimeString + " [v(t)] - " + c_twoPrimeString + " [v(t)]^2 - " + "(" + c_threeString + " exp(-" + c_fourString + " v(t)) + " + c_fiveString + ")[v(t)]^2");
-			} else {
-				equationLabel.setText("v'(t) = " + c_zeroString + " - " + c_oneString + " [v(t)] - " + c_twoString + " [v(t)]^2");
-			}
-			if (!inError) {
-				c_twoInput.requestFocus();
-			}
-			if (autoUpdateBox.isSelected()) {
-				updateGraph();
-			}
-
-		});
-
-		c_twoInput.addActionListener((e) -> {
-			c_twoString = c_twoInput.getText().replaceAll(" Enter number: ", "");
-			c_twoPrimeString = c_twoString;
-			boolean inError = false;
-			try {
-				c_twoInput.setForeground(Color.black);
-				if (Double.parseDouble(c_twoInput.getText().replaceAll(" Enter number: ", "")) < 0) {
-					throw new NumberFormatException();
+				if (dragCoeffBox.isSelected()) {
+					equationLabel.setText("v'(t) = " + primeStrings[0] + " - " + primeStrings[1] + " [v(t)] - " + primeStrings[2] + " [v(t)]^2 - " + "(" + inputStrings[3] + " exp(-" + inputStrings[4] + " v(t)) + " + inputStrings[5] + ")[v(t)]^2");
+				} else {
+					equationLabel.setText("v'(t) = " + inputStrings[0] + " - " + inputStrings[1] + " [v(t)] - " + inputStrings[2] + " [v(t)]^2");
 				}
-				solver.setC_two(Double.parseDouble(c_twoInput.getText().replaceAll(" Enter number: ", "")));
-				closedFormFunction.setGamma(Double.parseDouble(c_twoInput.getText().replaceAll(" Enter number: ", "")));
-				c_twoInput.setText("");
-			} catch (NumberFormatException e4) {
-				c_twoInput.setForeground(Color.red);
-				c_twoInput.setText(" Enter number: ");
-				inError = true;
-			}
-
-			if (dragCoeffBox.isSelected()) {
-				equationLabel.setText("v'(t) = " + c_zeroPrimeString + " - " + c_onePrimeString + " [v(t)] - " + c_twoPrimeString + " [v(t)]^2 - " + "(" + c_threeString + " exp(-" + c_fourString + " v(t)) + " + c_fiveString + ")[v(t)]^2");
-			} else {
-				equationLabel.setText("v'(t) = " + c_zeroString + " - " + c_oneString + " [v(t)] - " + c_twoString + " [v(t)]^2");
-			}
-			if (!inError) {
-				tInput.requestFocus();
-			}
-			if (autoUpdateBox.isSelected()) {
-				updateGraph();
-			}
-
-		});
-
-		c_threeInput.addActionListener((e) -> {
-			c_threeString = c_threeInput.getText().replaceAll(" Retry: ", "");
-			boolean inError = false;
-			try {
-				c_threeInput.setForeground(Color.black);
-				if (Double.parseDouble(c_threeInput.getText().replaceAll(" Retry: ", "")) < 0) {
-					throw new NumberFormatException();
+				if (!inError) {
+					if (i == 2) {
+						tInput.requestFocus();
+					}
+					if (i < inputs.length - 1) {
+						inputs[i + 1].requestFocus();
+					} else {
+						graphBox.requestFocus();
+					}
 				}
-				solver.setA(Double.parseDouble(c_threeInput.getText().replaceAll(" Retry: ", "")));
-				//					closedFormFunction.setGamma(Double.parseDouble(c_twoInput.getText().replaceAll(" Enter number: ", "")));
-				c_threeInput.setText("");
-			} catch (NumberFormatException e4) {
-				c_threeInput.setForeground(Color.red);
-				c_threeInput.setText(" Retry: ");
-				inError = true;
-			}
-
-			equationLabel.setText("v'(t) = " + c_zeroPrimeString + " - " + c_onePrimeString + " [v(t)] - " + c_twoPrimeString + " [v(t)]^2 - " + "(" + c_threeString + " exp(-" + c_fourString + " v(t)) + " + c_fiveString + ")[v(t)]^2");
-			if (!inError) {
-				c_fourInput.requestFocus();
-			}
-			if (autoUpdateBox.isSelected()) {
-				updateGraph();
-			}
-
-		});
-
-		c_fourInput.addActionListener((e) -> {
-			c_fourString = c_fourInput.getText().replaceAll(" Retry: ", "");
-			boolean inError = false;
-			try {
-				c_fourInput.setForeground(Color.black);
-				if (Double.parseDouble(c_fourInput.getText().replaceAll(" Retry: ", "")) < 0) {
-					throw new NumberFormatException();
+				if (autoUpdateBox.isSelected()) {
+					updateGraph();
 				}
-				solver.setB(Double.parseDouble(c_fourInput.getText().replaceAll(" Retry: ", "")));
-				//					closedFormFunction.setGamma(Double.parseDouble(c_twoInput.getText().replaceAll(" Enter number: ", "")));
-				c_fourInput.setText("");
-			} catch (NumberFormatException e4) {
-				c_fourInput.setForeground(Color.red);
-				c_fourInput.setText(" Retry: ");
-				inError = true;
-			}
 
-			equationLabel.setText("v'(t) = " + c_zeroPrimeString + " - " + c_onePrimeString + " [v(t)] - " + c_twoPrimeString + " [v(t)]^2 - " + "(" + c_threeString + " exp(-" + c_fourString + " v(t)) + " + c_fiveString + ")[v(t)]^2");
-			if (!inError) {
-				c_fiveInput.requestFocus();
-			}
-			if (autoUpdateBox.isSelected()) {
-				updateGraph();
-			}
-		});
-
-		c_fiveInput.addActionListener((e) -> {
-			c_fiveString = c_fiveInput.getText().replaceAll(" Retry: ", "");
-			boolean inError = false;
-			try {
-				c_fiveInput.setForeground(Color.black);
-				if (Double.parseDouble(c_fiveInput.getText().replaceAll(" Retry: ", "")) < 0) {
-					throw new NumberFormatException();
-				}
-				solver.setC(Double.parseDouble(c_fiveInput.getText().replaceAll(" Retry: ", "")));
-				//					closedFormFunction.setGamma(Double.parseDouble(c_twoInput.getText().replaceAll(" Enter number: ", "")));
-				c_fiveInput.setText("");
-			} catch (NumberFormatException e4) {
-				c_fiveInput.setForeground(Color.red);
-				c_fiveInput.setText(" Retry: ");
-				inError = true;
-			}
-
-			equationLabel.setText("v'(t) = " + c_zeroPrimeString + " - " + c_onePrimeString + " [v(t)] - " + c_twoPrimeString + " [v(t)]^2 - " + "(" + c_threeString + " exp(-" + c_fourString + " v(t)) + " + c_fiveString + ")[v(t)]^2");
-			if (!inError) {
-				graphBox.requestFocus();
-			}
-			if (autoUpdateBox.isSelected()) {
-				updateGraph();
-			}
-
-		});
+			});
+		}
 
 		smoothingFactorInput.addActionListener((e) -> {
 			int smoothingFactorOld = smoothingFactor;
@@ -712,9 +556,7 @@ public class GUI {
 
 		});
 
-		propertyChangeSupport.addPropertyChangeListener("smoothingFactorEntered", (evt) -> smoothingFactorEntered = true
-
-		);
+		propertyChangeSupport.addPropertyChangeListener("smoothingFactorEntered", (evt) -> smoothingFactorEntered = true);
 
 		smoothingFactorInput.addFocusListener(new FocusListener() {
 
@@ -810,60 +652,45 @@ public class GUI {
 
 		manualUpdateButton.addActionListener((e) -> updateGraph());
 
-		tMinInput.addActionListener((e) -> {
-			graph.setMinCounter(graph.getMinCounter() + 1);
-			closedFormGraph.setMinCounter(closedFormGraph.getMinCounter() + 1);
-			boolean inError = false;
-			try {
-				tMinInput.setForeground(Color.black);
-				if ((Double.parseDouble(tMinInput.getText().replaceAll(" #: ", "")) < graph.getTmax()) && (Double.parseDouble(tMinInput.getText().replaceAll(" #: ", "")) >= 0)) {
-					graph.setTmin(Double.parseDouble(tMinInput.getText().replaceAll(" #: ", "")));
-					rhandler.setTmin(Double.parseDouble(tMinInput.getText().replaceAll(" #: ", "")));
-					closedFormGraph.settMin(Double.parseDouble(tMinInput.getText().replaceAll(" #: ", "")));
-					tMinInput.setText("");
-				} else {
-					tMinInput.setForeground(Color.red);
+		Arrays.asList(false, true).forEach((max) -> {
+			JTextField input = max ? tMaxInput : tMinInput;
+			input.addActionListener((e) -> {
+				graph.setMinCounter(graph.getMinCounter() + 1);
+				closedFormGraph.setMinCounter(closedFormGraph.getMinCounter() + 1);
+				boolean inError = false;
+				try {
+					double value = Double.parseDouble(input.getText().replaceAll(" #: ", ""));
+					input.setForeground(Color.black);
+					if (!max && (value < graph.getTmax()) && value >= 0) {
+						graph.setTmin(value);
+						rhandler.setTmin(value);
+						closedFormGraph.setMin(value);
+						input.setText("");
+					} else if (max && (value > graph.getTmin()) && value >= 0) {
+						graph.setTmax(value);
+						rhandler.setTmax(value);
+						closedFormGraph.settMax(value);
+						input.setText("");
+					} else {
+						input.setForeground(Color.red);
+					}
+				} catch (NumberFormatException e6) {
+					inError = true;
+					input.setForeground(Color.red);
+					input.setText(" #: ");
 				}
-			} catch (NumberFormatException e6) {
-				inError = true;
-				tMinInput.setForeground(Color.red);
-				tMinInput.setText(" #: ");
-			}
-			if (!inError) {
-				tMaxInput.requestFocus();
-			}
-			if (autoUpdateBox.isSelected()) {
-				updateGraph();
-			}
-
-		});
-
-		tMaxInput.addActionListener((e) -> {
-			graph.setMaxCounter(graph.getMaxCounter() + 1);
-			closedFormGraph.setMaxCounter(closedFormGraph.getMaxCounter() + 1);
-			boolean inError = false;
-			try {
-				tMaxInput.setForeground(Color.black);
-				if ((Double.parseDouble(tMaxInput.getText().replaceAll(" #: ", "")) > graph.getTmin()) && (Double.parseDouble(tMaxInput.getText().replaceAll(" #: ", "")) >= 0)) {
-					graph.setTmax(Double.parseDouble(tMaxInput.getText().replaceAll(" #: ", "")));
-					rhandler.setTmax(Double.parseDouble(tMaxInput.getText().replaceAll(" #: ", "")));
-					closedFormGraph.settMax(Double.parseDouble(tMaxInput.getText().replaceAll(" #: ", "")));
-					tMaxInput.setText("");
-				} else {
-					tMaxInput.setForeground(Color.red);
+				if (!inError) {
+					if (!max) {
+						tMaxInput.requestFocus();
+					} else {
+						graphBox.requestFocus();
+					}
 				}
-			} catch (NumberFormatException e6) {
-				inError = true;
-				tMaxInput.setForeground(Color.red);
-				tMaxInput.setText(" #: ");
-			}
-			if (!inError) {
-				graphBox.requestFocus();
-			}
-			if (autoUpdateBox.isSelected()) {
-				updateGraph();
-			}
+				if (autoUpdateBox.isSelected()) {
+					updateGraph();
+				}
 
+			});
 		});
 
 		graphBox.addActionListener((e) -> {
@@ -927,7 +754,7 @@ public class GUI {
 		closedFormGraphBox.addActionListener((e) -> {
 			closedFormGraph.setCheckCounter(closedFormGraph.getCheckCounter() + 1);
 			if (closedFormGraph.getMaxCounter() == 0 & closedFormGraph.getMinCounter() == 0) {
-				closedFormGraph.settMin(0);
+				closedFormGraph.setMin(0);
 				closedFormGraph.settMax(120);
 			}
 			if (closedFormGraph.getCheckCounter() % 2 != 0) {
@@ -970,151 +797,110 @@ public class GUI {
 
 		});
 
-		dragCoeffBox.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dragCoeffCounter++;
-				if (dragCoeffCounter % 2 != 0) {
-					solver.setSolvingNormal(false);
-					solver.setSolvingDrag(true);
-					closedFormResultsTextArea.setVisible(false);
-					closedFormGraphBox.setEnabled(false);
-					frame.setSize(690, 400);
-					c_threeLabel.setVisible(true);
-					c_threeInput.setVisible(true);
-					c_fourLabel.setVisible(true);
-					c_fourInput.setVisible(true);
-					c_fiveLabel.setVisible(true);
-					c_fiveInput.setVisible(true);
-					smoother.setMaxAngle(smoother.getMaxAngle() / 5);
-					maxAngleInput.setText("");
-					equationLabel.setText("v'(t) = " + c_zeroPrimeString + " - " + c_onePrimeString + " [v(t)] - " + c_twoPrimeString + " [v(t)]^2 - " + "(" + c_threeString + " exp(-" + c_fourString + " [v(t)]) + " + c_fiveString + ")[v(t)]^2");
-					c_zeroLabel.setText("c" + SUB_ZERO + "' = ");
-					c_oneLabel.setText("c" + SUB_ONE + "' = ");
-					c_twoLabel.setText("c" + SUB_TWO + "' = ");
-				}
-				if (dragCoeffCounter % 2 == 0) {
-					solver.setSolvingDrag(false);
-					solver.setSolvingNormal(true);
-					closedFormResultsTextArea.setVisible(true);
-					closedFormGraphBox.setEnabled(true);
-					frame.setSize(662, 380);
-					c_threeLabel.setVisible(false);
-					c_threeInput.setVisible(false);
-					c_fourLabel.setVisible(false);
-					c_fourInput.setVisible(false);
-					c_fiveLabel.setVisible(false);
-					c_fiveInput.setVisible(false);
-					smoother.setMaxAngle(10);
-					maxAngleInput.setForeground(Color.gray);
-					maxAngleInput.setText(" (Default = 10\u00b0)");
-					equationLabel.setText("v'(t) = " + c_zeroString + " - " + c_oneString + " [v(t)] - " + c_twoString + " [v(t)]^2");
-					c_zeroLabel.setText("c" + SUB_ZERO + " = ");
-					c_oneLabel.setText("c" + SUB_ONE + " = ");
-					c_twoLabel.setText("c" + SUB_TWO + " = ");
-				}
-				if (autoUpdateBox.isSelected()) {
-					updateGraph();
-				}
-				// ADD THIS TO MANUAL UPDATE PROCESS
+		dragCoeffBox.addActionListener((e) -> {
+			boolean checked = dragCoeffBox.isSelected();
+			dragCoeffCounter++;
+			for (int i = 3; i < inputLabels.length; i++) {
+				inputLabels[i].setVisible(checked);
+				inputs[i].setVisible(checked);
+				inputLabels[i].setText("c" + SUB_CHARS[i] + " = ");
 			}
+			solver.setSolvingNormal(!checked);
+			solver.setSolvingDrag(checked);
+			closedFormResultsTextArea.setVisible(!checked);
+			closedFormGraphBox.setEnabled(!checked);
+			if (checked) {
+				frame.setSize(690, 400);
 
+				smoother.setMaxAngle(smoother.getMaxAngle() / 5);
+				maxAngleInput.setText("");
+				equationLabel.setText("v'(t) = " + primeStrings[0] + " - " + primeStrings[1] + " [v(t)] - " + primeStrings[2] + " [v(t)]^2 - " + "(" + inputStrings[3] + " exp(-" + inputStrings[4] + " v(t)) + " + inputStrings[5] + ")[v(t)]^2");
+			} else {
+				frame.setSize(662, 380);
+				smoother.setMaxAngle(10);
+				maxAngleInput.setForeground(Color.gray);
+				maxAngleInput.setText(" (Default = 10\u00b0)");
+				equationLabel.setText("v'(t) = " + inputStrings[0] + " - " + inputStrings[1] + " [v(t)] - " + inputStrings[2] + " [v(t)]^2");
+			}
+			if (autoUpdateBox.isSelected()) {
+				updateGraph();
+			}
+			// ADD THIS TO MANUAL UPDATE PROCESS
 		});
 
-		dpButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				exceptionText2.setText("You are currently using: Dormand Prince 853");
-				solver.setUsingRK(false);
-				solver.setUsingDP(true);
-				if (autoUpdateBox.isSelected()) {
-					updateGraph();
-				}
+		dpButton.addActionListener((e) -> {
+			exceptionText2.setText("You are currently using: Dormand Prince 853");
+			solver.setUsingRK(false);
+			solver.setUsingDP(true);
+			if (autoUpdateBox.isSelected()) {
+				updateGraph();
 			}
-
 		});
 
-		rkButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				exceptionText2.setText("You are currently using: Classical Runge Kutta");
-				solver.setUsingDP(false);
-				solver.setUsingRK(true);
-				if (autoUpdateBox.isSelected()) {
-					updateGraph();
-				}
+		rkButton.addActionListener((e) -> {
+			exceptionText2.setText("You are currently using: Classical Runge Kutta");
+			solver.setUsingDP(false);
+			solver.setUsingRK(true);
+			if (autoUpdateBox.isSelected()) {
+				updateGraph();
 			}
-
 		});
 
-		hInput.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					hInput.setForeground(Color.black);
-					solver.setH(Double.parseDouble(hInput.getText().replaceAll(" #: ", "")));
-					rhandler.setH(Double.parseDouble(hInput.getText().replaceAll(" #: ", "")));
-					hInput.setText("");
-				} catch (NumberFormatException e7) {
-					hInput.setForeground(Color.red);
-					hInput.setText(" #: ");
-				}
-				if (autoUpdateBox.isSelected()) {
-					updateGraph();
-				}
+		hInput.addActionListener((e) -> {
+			try {
+				hInput.setForeground(Color.black);
+				solver.setH(Double.parseDouble(hInput.getText().replaceAll(" #: ", "")));
+				rhandler.setH(Double.parseDouble(hInput.getText().replaceAll(" #: ", "")));
+				hInput.setText("");
+			} catch (NumberFormatException e7) {
+				hInput.setForeground(Color.red);
+				hInput.setText(" #: ");
 			}
-
+			if (autoUpdateBox.isSelected()) {
+				updateGraph();
+			}
 		});
 
-		tInput.addActionListener(new ActionListener() {
+		tInput.addActionListener((e) -> {
+			try {
+				tInput.setForeground(Color.BLACK);
+				t = Double.parseDouble(tInput.getText().replaceAll(" Enter t \u2265 0: ", ""));
+				solver.setReady(true);
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					tInput.setForeground(Color.BLACK);
-					t = Double.parseDouble(tInput.getText().replaceAll(" Enter t \u2265 0: ", ""));
-					solver.setReady(true);
-
-					if (t > 0) {
-						try {
-							tInput.setForeground(Color.black);
-							cfResult = closedFormFunction.value(t);
-							result = solver.solve(t);
-							if (Double.isNaN(result)) {
-								resultsTextArea.append("NaN" + "\n");
-								throw new NotANumberException();
-							}
-							resultsTextArea.append(" v(" + tInput.getText().replaceAll(" Enter t \u2265 0: ", "") + ") = " + result + "\n");
-							closedFormResultsTextArea.append(" v(" + tInput.getText().replaceAll(" Enter t \u2265 0: ", "") + ") = " + cfResult + "\n");
-							tInput.setText("");
-						} catch (NumberIsTooSmallException | NotANumberException e1) {
-							exceptionDialog.setVisible(true);
-							closedFormExceptionDialog.setVisible(true);
-							tInput.setText("");
-						}
-
-					} else if (t == 0) {
+				if (t > 0) {
+					try {
 						tInput.setForeground(Color.black);
-						result = 0;
-						cfResult = 0;
+						cfResult = closedFormFunction.value(t);
+						result = solver.solve(t);
+						if (Double.isNaN(result)) {
+							resultsTextArea.append("NaN" + "\n");
+							throw new NotANumberException();
+						}
 						resultsTextArea.append(" v(" + tInput.getText().replaceAll(" Enter t \u2265 0: ", "") + ") = " + result + "\n");
-						closedFormResultsTextArea.append(" v(" + tInput.getText().replaceAll(" Enter t \u2265 0: ", "") + ") = " + result + "\n");
+						closedFormResultsTextArea.append(" v(" + tInput.getText().replaceAll(" Enter t \u2265 0: ", "") + ") = " + cfResult + "\n");
 						tInput.setText("");
-					} else {
-						tInput.setForeground(Color.red);
-						tInput.setText(" Enter t \u2265 0: ");
+					} catch (NumberIsTooSmallException | NotANumberException e1) {
+						exceptionDialog.setVisible(true);
+						closedFormExceptionDialog.setVisible(true);
+						tInput.setText("");
 					}
 
-				} catch (IllegalArgumentException e9) { //originally had numberformatexception
+				} else if (t == 0) {
+					tInput.setForeground(Color.black);
+					result = 0;
+					cfResult = 0;
+					resultsTextArea.append(" v(" + tInput.getText().replaceAll(" Enter t \u2265 0: ", "") + ") = " + result + "\n");
+					closedFormResultsTextArea.append(" v(" + tInput.getText().replaceAll(" Enter t \u2265 0: ", "") + ") = " + result + "\n");
+					tInput.setText("");
+				} else {
 					tInput.setForeground(Color.red);
 					tInput.setText(" Enter t \u2265 0: ");
 				}
-			}
 
+			} catch (IllegalArgumentException e9) { //originally had numberformatexception
+				tInput.setForeground(Color.red);
+				tInput.setText(" Enter t \u2265 0: ");
+			}
 		});
 
 		//		exceptionDialog.setVisible(true);  /* ---> this is for debugging */
@@ -1122,9 +908,4 @@ public class GUI {
 		frame.setVisible(true);
 
 	}
-	/*	
-		public static void main(String[] args) {
-			new RiccatiGUI();
-		}
-	*/
 }

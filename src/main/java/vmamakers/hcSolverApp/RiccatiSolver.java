@@ -13,9 +13,6 @@ public class RiccatiSolver {
 	private double c_zero;
 	private double c_one;
 	private double c_two;
-	private double a;
-	private double b;
-	private double c;
 	private boolean isUsingDP;
 	private boolean isUsingRK;
 	private double h = 0.0001;
@@ -63,33 +60,14 @@ public class RiccatiSolver {
 		this.h = h;
 	}
 
-	public double getC_zero() {
-		return c_zero;
+	public double getConstant(int index) {
+		return constants[index];
 	}
-
-	public void setC_zero(double c_zero) {
-		this.c_zero = c_zero;
-		constants[0] = c_zero;
+	
+	public void setConstant(int index, double constant) {
+		constants[index] = constant;
 	}
-
-	public double getC_one() {
-		return c_one;
-	}
-
-	public void setC_one(double c_one) {
-		this.c_one = c_one;
-		constants[1] = c_one;
-	}
-
-	public double getC_two() {
-		return c_two;
-	}
-
-	public void setC_two(double c_two) {
-		this.c_two = c_two;
-		constants[2] = c_two;
-	}
-
+	
 	public boolean isReady() {
 		return isReady;
 	}
@@ -146,31 +124,12 @@ public class RiccatiSolver {
 		this.regCoeff = regCoeff;
 	}
 
-	public double getA() {
-		return a;
+	public double getCoeff(int index) {
+		return regCoeff[index];
 	}
 
-	public double getB() {
-		return b;
-	}
-
-	public double getC() {
-		return c;
-	}
-
-	public void setA(double a) {
-		this.a = a;
-		regCoeff[0] = a;
-	}
-
-	public void setB(double b) {
-		this.b = b;
-		regCoeff[1] = b;
-	}
-
-	public void setC(double c) {
-		this.c = c;
-		regCoeff[2] = c;
+	public void setCoeff(int index, double value) {
+		regCoeff[index] = value;
 	}
 
 }
