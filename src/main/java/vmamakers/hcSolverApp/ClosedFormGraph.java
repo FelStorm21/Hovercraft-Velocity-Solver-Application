@@ -1,4 +1,5 @@
 package vmamakers.hcSolverApp;
+
 import java.awt.Point;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -14,47 +15,47 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
 public class ClosedFormGraph {
-	
+
 	private XYSeries series;
 	private XYSeriesCollection dataset;
 	private JFreeChart chart;
 	private JFrame chartFrame;
-	
+
 	private double tMin = 0;
 	private double tMax = 120;
-	private double stepsize = (tMax - tMin)/60;
-	
+	private double stepsize = (tMax - tMin) / 60;
+
 	private ClosedFormFunction closedFormFunction;
 	private RiccatiHandler rhandler;
-	
+
 	private int maxCounter;
 	private int minCounter;
 	private int checkCounter;
 	private Point lastLocation;
-	
+
 	private PropertyChangeSupport pcs;
-	
+
 	private HashMap<Double, Double> closedFormGraphData;
-	
+
 	public ClosedFormGraph() {
 		this.pcs = new PropertyChangeSupport(this);
 		this.series = new XYSeries("Predicted");
 		this.closedFormGraphData = new HashMap<Double, Double>(100);
 	}
-	
+
 	public void generateData() {
-//		stepsize = rhandler.getStepsize();
-//		tMin = rhandler.getTmin();
-//		tMax = rhandler.getTmax();
+		//		stepsize = rhandler.getStepsize();
+		//		tMin = rhandler.getTmin();
+		//		tMax = rhandler.getTmax();
 		for (double i = tMin; i <= tMax; i += stepsize) {
 			series.add(i, closedFormFunction.value(i));
 			closedFormGraphData.put(i, closedFormFunction.value(i));
 		}
 	}
-	
+
 	public void plot() {
-//		series = new XYSeries("Predicted");
-		
+		//		series = new XYSeries("Predicted");
+
 		dataset = new XYSeriesCollection(series);
 		chart = ChartFactory.createXYLineChart("Riccati D.E. Closed-Form Solution", "Time (s)", "Speed (m/s)", dataset);
 		chartFrame = new ChartFrame("Graph", chart);
@@ -62,19 +63,32 @@ public class ClosedFormGraph {
 		chartFrame.setSize(500, 500);
 		chartFrame.setLocationRelativeTo(null);
 		chartFrame.setVisible(true);
-		
+
 		chartFrame.addWindowListener(new WindowListener() {
 
-			@Override public void windowOpened(WindowEvent e) {}
-			@Override public void windowClosing(WindowEvent e) {}
-			@Override public void windowClosed(WindowEvent e) {
+			@Override
+			public void windowOpened(WindowEvent e) {}
+
+			@Override
+			public void windowClosing(WindowEvent e) {}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
 				pcs.firePropertyChange("closedFormGraphClosed", false, true);
 			}
-			@Override public void windowIconified(WindowEvent e) {}
-			@Override public void windowDeiconified(WindowEvent e) {}
-			@Override public void windowActivated(WindowEvent e) {}
-			@Override public void windowDeactivated(WindowEvent e) {}
-			
+
+			@Override
+			public void windowIconified(WindowEvent e) {}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {}
+
+			@Override
+			public void windowActivated(WindowEvent e) {}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {}
+
 		});
 	}
 
@@ -157,15 +171,15 @@ public class ClosedFormGraph {
 	public void setCheckCounter(int checkCounter) {
 		this.checkCounter = checkCounter;
 	}
-/*
-	public HashMap<Double, Double> getClosedFormGraphData() {
-		return closedFormGraphData;
-	}
-
-	public void setClosedFormGraphData(HashMap<Double, Double> closedFormGraphData) {
-		this.closedFormGraphData = closedFormGraphData;
-	}
-*/
+	/*
+		public HashMap<Double, Double> getClosedFormGraphData() {
+			return closedFormGraphData;
+		}
+	
+		public void setClosedFormGraphData(HashMap<Double, Double> closedFormGraphData) {
+			this.closedFormGraphData = closedFormGraphData;
+		}
+	*/
 
 	public Point getLastLocation() {
 		return lastLocation;
