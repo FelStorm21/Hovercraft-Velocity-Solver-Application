@@ -104,7 +104,7 @@ public class ClosedFormGraph {
 		return tMin;
 	}
 
-	public void settMin(double tMin) {
+	public void setMin(double tMin) {
 		this.tMin = tMin;
 	}
 

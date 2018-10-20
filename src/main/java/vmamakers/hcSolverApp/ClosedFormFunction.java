@@ -46,6 +46,20 @@ public class ClosedFormFunction implements UnivariateFunction {
 		return value;
 	}
 
+	public void setValue(int index, double value) {
+		switch (index) {
+		case 0:
+			setChi(value);
+			break;
+		case 1:
+			setPhi(value);
+			break;
+		default:
+			setGamma(value);
+			break;
+		}
+	}
+
 	public double getChi() {
 		return chi;
 	}
