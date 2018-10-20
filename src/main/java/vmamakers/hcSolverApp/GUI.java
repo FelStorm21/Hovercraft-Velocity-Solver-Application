@@ -322,6 +322,7 @@ public class GUI {
 
 		for (int i = 3; i < inputLabels.length; i++) {
 			inputLabels[i].setVisible(false);
+			inputs[i].setVisible(false);
 		}
 
 		JDialog closedFormExceptionDialog = new JDialog();
