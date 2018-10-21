@@ -31,13 +31,21 @@ public class DragCoefficientDiffEq implements FirstOrderDifferentialEquations {
 	public void setConstants(double[] constants) {
 		this.constants = constants;
 	}
+	
+	public void setConstant(int index, double constant) {
+		constants[index] = constant;
+	}
 
 	public double[] getRegCoeff() {
 		return regCoeff;
 	}
 
-	public void setRegCoeff(double[] regCoeff) {
+	public void setRegCoeffs(double[] regCoeff) {
 		this.regCoeff = regCoeff;
+	}
+	
+	public void setRegCoeff(int index, double constant) {
+		regCoeff[index] = constant;
 	}
 
 }

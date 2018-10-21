@@ -29,6 +29,10 @@ public class RiccatiDifferentialEquation implements FirstOrderDifferentialEquati
 	public void setConstants(double[] constants) {
 		this.constants = constants;
 	}
+	
+	public void setConstant(int index, double constant) {
+		constants[index] = constant;
+	}
 
 }
 

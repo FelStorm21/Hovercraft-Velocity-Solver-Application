@@ -99,14 +99,6 @@ public class RiccatiSolver implements FixedStepHandler {
 	public void setH(double h) {
 		this.h = h;
 	}
-
-	public double getConstant(int index) {
-		return constants[index];
-	}
-	
-	public void setConstant(int index, double constant) {
-		constants[index] = constant;
-	}
 	
 	public boolean getFlag(int index) {
 		return flags[index];
@@ -125,14 +117,24 @@ public class RiccatiSolver implements FixedStepHandler {
 		((RiccatiDifferentialEquation) myEquation).setConstants(constants);
 		((DragCoefficientDiffEq) dragEquation).setConstants(constants);
 	}
-
-	public double[] getRegCoeff() {
+	
+	public double getConstant(int index) {
+		return constants[index];
+	}
+	
+	public void setConstant(int index, double constant) {
+		constants[index] = constant;
+		((RiccatiDifferentialEquation) myEquation).setConstant(index, constant);
+		((DragCoefficientDiffEq) dragEquation).setConstant(index, constant);
+	}
+	
+	public double[] getRegCoeffs() {
 		return regCoeff;
 	}
 
-	public void setRegCoeff(double[] regCoeff) {
+	public void setRegCoeffs(double[] regCoeff) {
 		this.regCoeff = regCoeff;
-		((DragCoefficientDiffEq) dragEquation).setRegCoeff(constants);
+		((DragCoefficientDiffEq) dragEquation).setRegCoeffs(regCoeff);
 	}
 
 	public double getRegCoeff(int index) {
@@ -141,6 +143,7 @@ public class RiccatiSolver implements FixedStepHandler {
 
 	public void setRegCoeff(int index, double value) {
 		regCoeff[index] = value;
+		((DragCoefficientDiffEq) dragEquation).setRegCoeff(index, value);
 	}
 
 	public double[] getBounds() {
