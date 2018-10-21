@@ -1,4 +1,4 @@
-package vmamakers.hcSolverApp;
+package me.vmamakers.hcsolverapp2;
 
 public class Main {
 

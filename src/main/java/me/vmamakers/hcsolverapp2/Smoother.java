@@ -1,9 +1,9 @@
-package vmamakers.hcSolverApp;
+package me.vmamakers.hcsolverapp2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class RiccatiSmoother {
+public class Smoother {
 	private HashMap<Double, Double> graphData;
 	private double maxAngle = 10;
 	private boolean isSmooth = false;

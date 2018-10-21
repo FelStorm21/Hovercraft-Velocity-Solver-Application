@@ -1,4 +1,4 @@
-package vmamakers.hcSolverApp;
+package me.vmamakers.hcsolverapp2;
 
 import java.util.HashMap;
 
@@ -11,10 +11,10 @@ public final class AppTest {
 	
 	private ClosedFormFunction cff;
 	private RiccatiSolver solver;
-	private RiccatiSmoother smoother;
+	private Smoother smoother;
 	private HashMap<Double, Double> smoothValues;
 	private HashMap<Double, Double> roughValues;
-	private RiccatiHandler rhandler;
+//	private RiccatiHandler rhandler;
 	private double stepsize;
 	private RiccatiDifferentialEquation diffeq;
 	private double[] constants;
@@ -33,13 +33,13 @@ public final class AppTest {
 		cff.setChi(10);
 		cff.setPhi(0.1);
 		cff.setGamma(0.01);
-		solver = new RiccatiSolver();
+		solver = new RiccatiSolver(stepsize);
 		solver.setConstants(constants);
-		solver.setReady(true);
-		solver.setUsingDP(true);
-		solver.setSolvingDrag(false);
-		solver.setSolvingNormal(true);
-		smoother = new RiccatiSmoother();
+		solver.setFlag(0, true);   // [0]isReady, [1]isSolvingNormal, [2]isSolvingDrag, [3]isUsingDP, [4]isUsingRK
+		solver.setFlag(3, true);
+		solver.setFlag(2, false);
+		solver.setFlag(1, true);
+		smoother = new Smoother();
 		roughValues = new HashMap<Double, Double>(3);
 			roughValues.put(1.0, 1.0);
 			roughValues.put(2.0, 2.0);
@@ -48,8 +48,8 @@ public final class AppTest {
 			for (int i = 1; i <=3; i++) {
 				smoothValues.put((double) i, (double) i);
 			}
-		rhandler = new RiccatiHandler(stepsize);
-		rhandler.setSolver(solver);
+//		rhandler = new RiccatiHandler(stepsize);
+//		rhandler.setSolver(solver);
 		diffeq = new RiccatiDifferentialEquation(constants);
 	}
 	
@@ -100,7 +100,7 @@ public final class AppTest {
 	@Test
 	public void solveEquals() {
 		final double expected = 27;
-		final double actual = Math.round(solver.solve(15));
+		final double actual = Math.round(solver.solve(15, false));
 		Assert.assertEquals(actual, expected);
 	}
 	
@@ -108,7 +108,7 @@ public final class AppTest {
 	public void solveIsNaN() {
 		boolean caught = false;
 		try {
-			solver.solve(-1);
+			solver.solve(-1, false);
 		} catch(IllegalArgumentException e) {
 			caught = true;
 		}
@@ -134,8 +134,10 @@ public final class AppTest {
 	@Test
 	public void handlerGenerateExpectedData() {
 		final double expected = 25;
-		rhandler.generateData();
-		final double actual = Math.round(rhandler.getGraphData().get(5.0));
+		solver.solve(0, true);
+//		rhandler.generateData();
+		final double actual = Math.round(solver.getGraphData().get(5.0));
+//		final double actual = Math.round(rhandler.getGraphData().get(5.0));
 		Assert.assertEquals(actual, expected);
 	}
 	
@@ -153,7 +155,7 @@ public final class AppTest {
 		cff = null;
 		solver = null;
 		smoother = null;
-		rhandler = null;
+//		rhandler = null;
 		diffeq = null;
 	}
 	

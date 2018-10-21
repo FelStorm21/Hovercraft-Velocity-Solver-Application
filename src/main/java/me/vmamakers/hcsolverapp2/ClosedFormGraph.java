@@ -1,4 +1,4 @@
-package vmamakers.hcSolverApp;
+package me.vmamakers.hcsolverapp2;
 
 import java.awt.Point;
 import java.awt.event.WindowEvent;
@@ -14,7 +14,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-public class ClosedFormGraph {
+public class ClosedFormGraph {  //DOESN'T NEED A SOLVER; REDUCE DOUBLES TO ARRAY
 
 	private XYSeries series;
 	private XYSeriesCollection dataset;
@@ -26,7 +26,8 @@ public class ClosedFormGraph {
 	private double stepsize = (tMax - tMin) / 60;
 
 	private ClosedFormFunction closedFormFunction;
-	private RiccatiHandler rhandler;
+	private RiccatiSolver solver;
+//	private RiccatiHandler rhandler;
 
 	private int maxCounter;
 	private int minCounter;
@@ -38,9 +39,9 @@ public class ClosedFormGraph {
 	private HashMap<Double, Double> closedFormGraphData;
 
 	public ClosedFormGraph() {
-		this.pcs = new PropertyChangeSupport(this);
-		this.series = new XYSeries("Predicted");
-		this.closedFormGraphData = new HashMap<Double, Double>(100);
+		pcs = new PropertyChangeSupport(this);
+		series = new XYSeries("Predicted");
+		closedFormGraphData = new HashMap<Double, Double>(100);
 	}
 
 	public void generateData() {
@@ -96,6 +97,14 @@ public class ClosedFormGraph {
 		return stepsize;
 	}
 
+	public RiccatiSolver getSolver() {
+		return solver;
+	}
+
+	public void setSolver(RiccatiSolver solver) {
+		this.solver = solver;
+	}
+
 	public void setStepsize(double stepsize) {
 		this.stepsize = stepsize;
 	}
@@ -116,13 +125,13 @@ public class ClosedFormGraph {
 		this.tMax = tMax;
 	}
 
-	public RiccatiHandler getRhandler() {
-		return rhandler;
-	}
-
-	public void setRhandler(RiccatiHandler rhandler) {
-		this.rhandler = rhandler;
-	}
+//	public RiccatiHandler getRhandler() {
+//		return rhandler;
+//	}
+//
+//	public void setRhandler(RiccatiHandler rhandler) {
+//		this.rhandler = rhandler;
+//	}
 
 	public ClosedFormFunction getClosedFormFunction() {
 		return closedFormFunction;

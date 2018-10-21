@@ -1,4 +1,4 @@
-package vmamakers.hcSolverApp;
+package me.vmamakers.hcsolverapp2;
 
 import java.beans.PropertyChangeSupport;
 
@@ -46,7 +46,7 @@ public class ClosedFormFunction implements UnivariateFunction {
 		return value;
 	}
 
-	public void setValue(int index, double value) {
+	public void setConstant(int index, double value) {
 		switch (index) {
 		case 0:
 			setChi(value);

@@ -1,4 +1,4 @@
-package vmamakers.hcSolverApp;
+package me.vmamakers.hcsolverapp2;
 
 import java.awt.Point;
 import java.awt.event.WindowEvent;

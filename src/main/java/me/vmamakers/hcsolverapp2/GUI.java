@@ -1,4 +1,4 @@
-package vmamakers.hcSolverApp;
+package me.vmamakers.hcsolverapp2;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,8 +36,9 @@ import org.apache.commons.math3.exception.NumberIsTooSmallException;
 public class GUI {
 
 	private RiccatiGraph graph;
-	private RiccatiHandler rhandler;
-	private RiccatiSmoother smoother;
+	private RiccatiSolver solver;
+//	private RiccatiHandler rhandler;
+	private Smoother smoother;
 	private @SuppressWarnings("unused") ClosedFormFunction closedFormFunction;
 	private ClosedFormGraph closedFormGraph;
 
@@ -77,25 +78,32 @@ public class GUI {
 			if ((graph.getChartFrame() != null && graph.getChartFrame().isVisible()) && (closedFormGraph.getChartFrame() != null && closedFormGraph.getChartFrame().isVisible())) {
 				graph.getDataset().removeAllSeries();
 				closedFormGraph.getDataset().removeAllSeries();
-				rhandler.getGraphData().clear();
+				solver.getGraphData().clear();
+//				rhandler.getGraphData().clear();
 				graph.getGraphData().clear();
 				closedFormGraph.getSeries().clear();
-				rhandler.generateData();
+				solver.solve(0, true);
+//				rhandler.generateData();
 				closedFormGraph.generateData();
-				graph.setGraphData(rhandler.getGraphData());
+				graph.setGraphData(solver.getGraphData());
+//				graph.setGraphData(rhandler.getGraphData());
 				smoother.setGraphData(graph.getGraphData());
 
 				if (!smoother.checkSmooth()) {
 					resultsTextArea.append("Smoothing...\n");
 					closedFormResultsTextArea.append("Smoothing...\n");
-					rhandler.setStepsize(defaultStepsize / smoothingFactor);
+//					rhandler.setStepsize(defaultStepsize / smoothingFactor);
+					solver.setBound(2, defaultStepsize / smoothingFactor);
 					closedFormGraph.setStepsize(defaultStepsize / smoothingFactor);
 					closedFormGraph.getClosedFormGraphData().clear();
-					rhandler.getGraphData().clear();
+//					rhandler.getGraphData().clear();
+					solver.getGraphData().clear();
 					graph.getGraphData().clear();
-					rhandler.generateData();
+					solver.solve(0, true);
+//					rhandler.generateData();
 					closedFormGraph.generateData();
-					graph.setGraphData(rhandler.getGraphData());
+//					graph.setGraphData(rhandler.getGraphData());
+					graph.setGraphData(solver.getGraphData());
 					smoother.setGraphData(graph.getGraphData());
 					resultsTextArea.append("Smoothing complete.\n");
 					closedFormResultsTextArea.append("Smoothing complete.\n");
@@ -110,19 +118,26 @@ public class GUI {
 
 			} else if ((graph.getChartFrame() != null && graph.getChartFrame().isVisible())/* && (closedFormGraph.getChartFrame() == null && !closedFormGraph.getChartFrame().isVisible())*/) {
 				graph.getDataset().removeAllSeries();
-				rhandler.getGraphData().clear();
+				solver.getGraphData().clear();
+//				rhandler.getGraphData().clear();
 				graph.getGraphData().clear();
-				rhandler.generateData();
-				graph.setGraphData(rhandler.getGraphData());
+				solver.solve(0, true);
+//				rhandler.generateData();
+				graph.setGraphData(solver.getGraphData());
+//				graph.setGraphData(rhandler.getGraphData());
 				smoother.setGraphData(graph.getGraphData());
 
 				if (!smoother.checkSmooth()) {
 					resultsTextArea.append("Smoothing...\n");
-					rhandler.setStepsize(defaultStepsize / smoothingFactor);
-					rhandler.getGraphData().clear();
+					solver.setBound(2, defaultStepsize / smoothingFactor);
+//					rhandler.setStepsize(defaultStepsize / smoothingFactor);				
+					solver.getGraphData().clear();
+//					rhandler.getGraphData().clear();
 					graph.getGraphData().clear();
-					rhandler.generateData();
-					graph.setGraphData(rhandler.getGraphData());
+					solver.solve(0, true);
+//					rhandler.generateData();
+					graph.setGraphData(solver.getGraphData());
+//					graph.setGraphData(rhandler.getGraphData());
 					smoother.setGraphData(graph.getGraphData());
 					resultsTextArea.append("Smoothing complete.\n");
 				}
@@ -150,9 +165,11 @@ public class GUI {
 				closedFormGraph.getDataset().addSeries(closedFormGraph.getSeries());
 				closedFormGraph.getChartFrame().repaint();
 			} else {
-				rhandler.generateData();
+				solver.solve(0, true);
+//				rhandler.generateData();
 				closedFormGraph.generateData();
-				graph.setGraphData(rhandler.getGraphData());
+				graph.setGraphData(solver.getGraphData());
+//				graph.setGraphData(rhandler.getGraphData());
 				smoother.setGraphData(graph.getGraphData());
 				if (!smoother.checkSmooth()) {
 					if (graphBox.isSelected()) {
@@ -161,11 +178,14 @@ public class GUI {
 					if (closedFormGraphBox.isSelected()) {
 						closedFormResultsTextArea.append("Smoothing...\n");
 					}
-					rhandler.setStepsize(defaultStepsize / smoothingFactor);
+					solver.setBound(2, defaultStepsize / smoothingFactor);
+//					rhandler.setStepsize(defaultStepsize / smoothingFactor);
 					closedFormGraph.setStepsize(defaultStepsize / smoothingFactor);
-					rhandler.generateData();
+					solver.solve(0, true);
+//					rhandler.generateData();
 					closedFormGraph.generateData();
-					graph.setGraphData(rhandler.getGraphData());
+					graph.setGraphData(solver.getGraphData());
+//					graph.setGraphData(rhandler.getGraphData());
 					smoother.setGraphData(graph.getGraphData());
 					if (graphBox.isSelected()) {
 						resultsTextArea.append("Smoothing complete.\n");
@@ -195,25 +215,24 @@ public class GUI {
 	private void initGui() {
 
 		// set up all the objects we need to integrate into the gui	
-
-		propertyChangeSupport = new PropertyChangeSupport(this);
-
-		RiccatiSolver solver = new RiccatiSolver();
-		solver.setUsingDP(true);
-		solver.setSolvingNormal(true);
-		solver.setSolvingDrag(false);
-
 		RiccatiGraph graph = new RiccatiGraph();
 		this.graph = graph;
+		
+		defaultStepsize = (graph.getTmax() - graph.getTmin()) / 60;
+		propertyChangeSupport = new PropertyChangeSupport(this);
+
+		solver = new RiccatiSolver(defaultStepsize);
+		solver.setFlag(3, true);
+		solver.setFlag(1, true);
+		solver.setFlag(2, false);
+
 		graph.setSolver(solver);
 
-		this.defaultStepsize = (graph.getTmax() - graph.getTmin()) / 60;
+//		RiccatiHandler rhandler = new RiccatiHandler((graph.getTmax() - graph.getTmin()) / 60); //uses arbitrary stepsize
+//		this.rhandler = rhandler;
+//		rhandler.setSolver(solver);
 
-		RiccatiHandler rhandler = new RiccatiHandler((graph.getTmax() - graph.getTmin()) / 60); //uses arbitrary stepsize
-		this.rhandler = rhandler;
-		rhandler.setSolver(solver);
-
-		RiccatiSmoother smoother = new RiccatiSmoother();
+		Smoother smoother = new Smoother();
 		this.smoother = smoother;
 
 		ClosedFormFunction closedFormFunction = new ClosedFormFunction();
@@ -221,7 +240,8 @@ public class GUI {
 
 		ClosedFormGraph closedFormGraph = new ClosedFormGraph();
 		this.closedFormGraph = closedFormGraph;
-		closedFormGraph.setRhandler(rhandler);
+		closedFormGraph.setSolver(solver);
+//		closedFormGraph.setRhandler(rhandler);
 		closedFormGraph.setClosedFormFunction(closedFormFunction);
 
 		//set up all the swing components
@@ -476,9 +496,9 @@ public class GUI {
 					}
 					if (i < 3) {
 						solver.setConstant(i, value);
-						closedFormFunction.setValue(i, value);
+						closedFormFunction.setConstant(i, value);
 					} else {
-						solver.setCoeff(i - 3, value);
+						solver.setRegCoeff(i - 3, value);
 					}
 					input.setText("");
 				} catch (NumberFormatException e4) {
@@ -664,12 +684,14 @@ public class GUI {
 					input.setForeground(Color.black);
 					if (!max && (value < graph.getTmax()) && value >= 0) {
 						graph.setTmin(value);
-						rhandler.setTmin(value);
+						solver.setBound(0, value);
+//						rhandler.setTmin(value);
 						closedFormGraph.setMin(value);
 						input.setText("");
 					} else if (max && (value > graph.getTmin()) && value >= 0) {
 						graph.setTmax(value);
-						rhandler.setTmax(value);
+						solver.setBound(1, value);
+//						rhandler.setTmax(value);
 						closedFormGraph.settMax(value);
 						input.setText("");
 					} else {
@@ -697,28 +719,40 @@ public class GUI {
 		graphBox.addActionListener((e) -> {
 			graph.setCheckCounter(graph.getCheckCounter() + 1);
 			if (graph.getMaxCounter() == 0 & graph.getMinCounter() == 0) {
-				rhandler.setTmin(0);
-				rhandler.setTmax(120);
+				solver.setBound(0, 0);
+				solver.setBound(1, 120);
+//				rhandler.setTmin(0);
+//				rhandler.setTmax(120);
 				graph.setTmin(0);
 				graph.setTmax(120);
 			}
 			if (graph.getCheckCounter() % 2 != 0) {
 				try {
-					if (rhandler.getGraphData() != null && graph.getGraphData() != null) {
-						rhandler.getGraphData().clear();
+//					if (rhandler.getGraphData() != null && graph.getGraphData() != null) {
+//						rhandler.getGraphData().clear();
+//						graph.getGraphData().clear();
+//					}
+					if (solver.getGraphData() != null && graph.getGraphData() != null) {
+						solver.getGraphData().clear();
 						graph.getGraphData().clear();
 					}
-					rhandler.generateData();
-					//						System.out.println("Actual size of dataset: " + rhandler.getGraphData().size());
-					graph.setGraphData(rhandler.getGraphData());
+					solver.solve(0, true);
+//					rhandler.generateData();
+//					System.out.println("Actual size of dataset: " + rhandler.getGraphData().size());
+					graph.setGraphData(solver.getGraphData());
+//					graph.setGraphData(rhandler.getGraphData());
 					smoother.setGraphData(graph.getGraphData());
 					if (!smoother.checkSmooth()) {
 						resultsTextArea.append("Smoothing...\n");
-						rhandler.setStepsize(defaultStepsize / smoothingFactor);
-						rhandler.getGraphData().clear();
+						solver.setBound(2, defaultStepsize / smoothingFactor);
+						solver.getGraphData().clear();
+//						rhandler.setStepsize(defaultStepsize / smoothingFactor);
+//						rhandler.getGraphData().clear();
 						graph.getGraphData().clear();
-						rhandler.generateData();
-						graph.setGraphData(rhandler.getGraphData());
+						solver.solve(0, true);
+//						rhandler.generateData();
+						graph.setGraphData(solver.getGraphData());
+//						graph.setGraphData(rhandler.getGraphData());
 						smoother.setGraphData(graph.getGraphData());
 						resultsTextArea.append("Smoothing complete.\n");
 					}
@@ -806,8 +840,8 @@ public class GUI {
 				inputs[i].setVisible(checked);
 				inputLabels[i].setText("c" + SUB_CHARS[i] + " = ");
 			}
-			solver.setSolvingNormal(!checked);
-			solver.setSolvingDrag(checked);
+			solver.setFlag(1, !checked);
+			solver.setFlag(2, checked);
 			closedFormResultsTextArea.setVisible(!checked);
 			closedFormGraphBox.setEnabled(!checked);
 			if (checked) {
@@ -831,8 +865,8 @@ public class GUI {
 
 		dpButton.addActionListener((e) -> {
 			exceptionText2.setText("You are currently using: Dormand Prince 853");
-			solver.setUsingRK(false);
-			solver.setUsingDP(true);
+			solver.setFlag(4, false);
+			solver.setFlag(3, true);
 			if (autoUpdateBox.isSelected()) {
 				updateGraph();
 			}
@@ -840,8 +874,8 @@ public class GUI {
 
 		rkButton.addActionListener((e) -> {
 			exceptionText2.setText("You are currently using: Classical Runge Kutta");
-			solver.setUsingDP(false);
-			solver.setUsingRK(true);
+			solver.setFlag(3, false);
+			solver.setFlag(4, true);
 			if (autoUpdateBox.isSelected()) {
 				updateGraph();
 			}
@@ -851,7 +885,7 @@ public class GUI {
 			try {
 				hInput.setForeground(Color.black);
 				solver.setH(Double.parseDouble(hInput.getText().replaceAll(" #: ", "")));
-				rhandler.setH(Double.parseDouble(hInput.getText().replaceAll(" #: ", "")));
+//				rhandler.setH(Double.parseDouble(hInput.getText().replaceAll(" #: ", "")));
 				hInput.setText("");
 			} catch (NumberFormatException e7) {
 				hInput.setForeground(Color.red);
@@ -866,13 +900,13 @@ public class GUI {
 			try {
 				tInput.setForeground(Color.BLACK);
 				t = Double.parseDouble(tInput.getText().replaceAll(" Enter t \u2265 0: ", ""));
-				solver.setReady(true);
+				solver.setFlag(0, true);
 
 				if (t > 0) {
 					try {
 						tInput.setForeground(Color.black);
 						cfResult = closedFormFunction.value(t);
-						result = solver.solve(t);
+						result = solver.solve(t, false);
 						if (Double.isNaN(result)) {
 							resultsTextArea.append("NaN" + "\n");
 							throw new NotANumberException();
