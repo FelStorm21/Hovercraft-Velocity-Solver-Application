@@ -41,6 +41,7 @@ public class GUI {
 	private Smoother smoother;
 	private @SuppressWarnings("unused") ClosedFormFunction closedFormFunction;
 	private ClosedFormGraph closedFormGraph;
+	private GraphUpdater graphUpdater;
 
 	private static final String[] SUB_CHARS = { "\u2080", "\u2081", "\u2082", "\u2083", "\u2084", "\u2085" };
 	private String[] inputStrings;
@@ -73,148 +74,149 @@ public class GUI {
 		SwingUtilities.invokeLater(this::initGui);
 	}
 
-	public void updateGraph() {
-		try {
-			if ((graph.getChartFrame() != null && graph.getChartFrame().isVisible()) && (closedFormGraph.getChartFrame() != null && closedFormGraph.getChartFrame().isVisible())) {
-				graph.getDataset().removeAllSeries();
-				closedFormGraph.getDataset().removeAllSeries();
-				solver.getGraphData().clear();
-//				rhandler.getGraphData().clear();
-				graph.getGraphData().clear();
-				closedFormGraph.getSeries().clear();
-				solver.solve(0, true);
-//				rhandler.generateData();
-				closedFormGraph.generateData();
-				graph.setGraphData(solver.getGraphData());
-//				graph.setGraphData(rhandler.getGraphData());
-				smoother.setGraphData(graph.getGraphData());
-
-				if (!smoother.checkSmooth()) {
-					resultsTextArea.append("Smoothing...\n");
-					closedFormResultsTextArea.append("Smoothing...\n");
-//					rhandler.setStepsize(defaultStepsize / smoothingFactor);
-					solver.setBound(2, defaultStepsize / smoothingFactor);
-					closedFormGraph.setStepsize(defaultStepsize / smoothingFactor);
-					closedFormGraph.getClosedFormGraphData().clear();
-//					rhandler.getGraphData().clear();
-					solver.getGraphData().clear();
-					graph.getGraphData().clear();
-					solver.solve(0, true);
-//					rhandler.generateData();
-					closedFormGraph.generateData();
-//					graph.setGraphData(rhandler.getGraphData());
-					graph.setGraphData(solver.getGraphData());
-					smoother.setGraphData(graph.getGraphData());
-					resultsTextArea.append("Smoothing complete.\n");
-					closedFormResultsTextArea.append("Smoothing complete.\n");
-				}
-				//				System.out.println("Plotting graph");
-				graph.updateDataset();
-				closedFormGraph.generateData();
-				graph.getDataset().addSeries(graph.getSeries());
-				closedFormGraph.getDataset().addSeries(closedFormGraph.getSeries());
-				graph.getChartFrame().repaint();
-				closedFormGraph.getChartFrame().repaint();
-
-			} else if ((graph.getChartFrame() != null && graph.getChartFrame().isVisible())/* && (closedFormGraph.getChartFrame() == null && !closedFormGraph.getChartFrame().isVisible())*/) {
-				graph.getDataset().removeAllSeries();
-				solver.getGraphData().clear();
-//				rhandler.getGraphData().clear();
-				graph.getGraphData().clear();
-				solver.solve(0, true);
-//				rhandler.generateData();
-				graph.setGraphData(solver.getGraphData());
-//				graph.setGraphData(rhandler.getGraphData());
-				smoother.setGraphData(graph.getGraphData());
-
-				if (!smoother.checkSmooth()) {
-					resultsTextArea.append("Smoothing...\n");
-					solver.setBound(2, defaultStepsize / smoothingFactor);
-//					rhandler.setStepsize(defaultStepsize / smoothingFactor);				
-					solver.getGraphData().clear();
-//					rhandler.getGraphData().clear();
-					graph.getGraphData().clear();
-					solver.solve(0, true);
-//					rhandler.generateData();
-					graph.setGraphData(solver.getGraphData());
-//					graph.setGraphData(rhandler.getGraphData());
-					smoother.setGraphData(graph.getGraphData());
-					resultsTextArea.append("Smoothing complete.\n");
-				}
-				//				System.out.println("Plotting graph");
-				graph.updateDataset();
-				graph.getDataset().addSeries(graph.getSeries());
-				graph.getChartFrame().repaint();
-			} else if (/*(graph.getChartFrame() == null && !graph.getChartFrame().isVisible()) && */(closedFormGraph.getChartFrame() != null && closedFormGraph.getChartFrame().isVisible())) {
-				closedFormGraph.getDataset().removeAllSeries();
-				closedFormGraph.getClosedFormGraphData().clear();
-				closedFormGraph.getSeries().clear();
-				closedFormGraph.generateData();
-				smoother.setGraphData(closedFormGraph.getClosedFormGraphData());
-
-				if (!smoother.checkSmooth()) {
-					closedFormResultsTextArea.append("Smoothing...\n");
-					closedFormGraph.setStepsize(defaultStepsize / smoothingFactor);
-					closedFormGraph.getClosedFormGraphData().clear();
-					closedFormGraph.generateData();
-					smoother.setGraphData(closedFormGraph.getClosedFormGraphData());
-					closedFormResultsTextArea.append("Smoothing complete.\n");
-				}
-				//				System.out.println("Plotting graph");
-				closedFormGraph.generateData();
-				closedFormGraph.getDataset().addSeries(closedFormGraph.getSeries());
-				closedFormGraph.getChartFrame().repaint();
-			} else {
-				solver.solve(0, true);
-//				rhandler.generateData();
-				closedFormGraph.generateData();
-				graph.setGraphData(solver.getGraphData());
-//				graph.setGraphData(rhandler.getGraphData());
-				smoother.setGraphData(graph.getGraphData());
-				if (!smoother.checkSmooth()) {
-					if (graphBox.isSelected()) {
-						resultsTextArea.append("Smoothing...\n");
-					}
-					if (closedFormGraphBox.isSelected()) {
-						closedFormResultsTextArea.append("Smoothing...\n");
-					}
-					solver.setBound(2, defaultStepsize / smoothingFactor);
-//					rhandler.setStepsize(defaultStepsize / smoothingFactor);
-					closedFormGraph.setStepsize(defaultStepsize / smoothingFactor);
-					solver.solve(0, true);
-//					rhandler.generateData();
-					closedFormGraph.generateData();
-					graph.setGraphData(solver.getGraphData());
-//					graph.setGraphData(rhandler.getGraphData());
-					smoother.setGraphData(graph.getGraphData());
-					if (graphBox.isSelected()) {
-						resultsTextArea.append("Smoothing complete.\n");
-					}
-					if (closedFormGraphBox.isSelected()) {
-						closedFormResultsTextArea.append("Smoothing complete.\n");
-					}
-
-				}
-				closedFormGraph.generateData();
-				graph.plot();
-				closedFormGraph.plot();
-				if (graph.getLastLocation() != null) {
-					graph.getChartFrame().setLocation(graph.getLastLocation());
-				}
-				if (closedFormGraph.getLastLocation() != null) {
-					closedFormGraph.getChartFrame().setLocation(closedFormGraph.getLastLocation());
-				}
-				graph.setCheckCounter(graph.getCheckCounter() + 1);
-				closedFormGraph.setCheckCounter(closedFormGraph.getCheckCounter() + 1);
-			}
-		} catch (NumberIsTooSmallException e) {
-			exceptionDialog.setVisible(true);
-		}
-	}
+//	public void graphUpdater.updateGraph() {
+//		try {
+//			if ((graph.getChartFrame() != null && graph.getChartFrame().isVisible()) && (closedFormGraph.getChartFrame() != null && closedFormGraph.getChartFrame().isVisible())) {
+//				graph.getDataset().removeAllSeries();
+//				closedFormGraph.getDataset().removeAllSeries();
+//				solver.getGraphData().clear();
+////				rhandler.getGraphData().clear();
+//				graph.getGraphData().clear();
+//				closedFormGraph.getSeries().clear();
+//				solver.solve(0, true);
+////				rhandler.generateData();
+//				closedFormGraph.generateData();
+//				graph.setGraphData(solver.getGraphData());
+////				graph.setGraphData(rhandler.getGraphData());
+//				smoother.setGraphData(graph.getGraphData());
+//
+//				if (!smoother.checkSmooth()) {
+//					resultsTextArea.append("Smoothing...\n");
+//					closedFormResultsTextArea.append("Smoothing...\n");
+////					rhandler.setStepsize(defaultStepsize / smoothingFactor);
+//					solver.setBound(2, defaultStepsize / smoothingFactor);
+//					closedFormGraph.setStepsize(defaultStepsize / smoothingFactor);
+//					closedFormGraph.getClosedFormGraphData().clear();
+////					rhandler.getGraphData().clear();
+//					solver.getGraphData().clear();
+//					graph.getGraphData().clear();
+//					solver.solve(0, true);
+////					rhandler.generateData();
+//					closedFormGraph.generateData();
+////					graph.setGraphData(rhandler.getGraphData());
+//					graph.setGraphData(solver.getGraphData());
+//					smoother.setGraphData(graph.getGraphData());
+//					resultsTextArea.append("Smoothing complete.\n");
+//					closedFormResultsTextArea.append("Smoothing complete.\n");
+//				}
+//				//				System.out.println("Plotting graph");
+//				graph.updateDataset();
+//				closedFormGraph.generateData();
+//				graph.getDataset().addSeries(graph.getSeries());
+//				closedFormGraph.getDataset().addSeries(closedFormGraph.getSeries());
+//				graph.getChartFrame().repaint();
+//				closedFormGraph.getChartFrame().repaint();
+//
+//			} else if ((graph.getChartFrame() != null && graph.getChartFrame().isVisible())/* && (closedFormGraph.getChartFrame() == null && !closedFormGraph.getChartFrame().isVisible())*/) {
+//				graph.getDataset().removeAllSeries();
+//				solver.getGraphData().clear();
+////				rhandler.getGraphData().clear();
+//				graph.getGraphData().clear();
+//				solver.solve(0, true);
+////				rhandler.generateData();
+//				graph.setGraphData(solver.getGraphData());
+////				graph.setGraphData(rhandler.getGraphData());
+//				smoother.setGraphData(graph.getGraphData());
+//
+//				if (!smoother.checkSmooth()) {
+//					resultsTextArea.append("Smoothing...\n");
+//					solver.setBound(2, defaultStepsize / smoothingFactor);
+////					rhandler.setStepsize(defaultStepsize / smoothingFactor);				
+//					solver.getGraphData().clear();
+////					rhandler.getGraphData().clear();
+//					graph.getGraphData().clear();
+//					solver.solve(0, true);
+////					rhandler.generateData();
+//					graph.setGraphData(solver.getGraphData());
+////					graph.setGraphData(rhandler.getGraphData());
+//					smoother.setGraphData(graph.getGraphData());
+//					resultsTextArea.append("Smoothing complete.\n");
+//				}
+//				//				System.out.println("Plotting graph");
+//				graph.updateDataset();
+//				graph.getDataset().addSeries(graph.getSeries());
+//				graph.getChartFrame().repaint();
+//			} else if (/*(graph.getChartFrame() == null && !graph.getChartFrame().isVisible()) && */(closedFormGraph.getChartFrame() != null && closedFormGraph.getChartFrame().isVisible())) {
+//				closedFormGraph.getDataset().removeAllSeries();
+//				closedFormGraph.getClosedFormGraphData().clear();
+//				closedFormGraph.getSeries().clear();
+//				closedFormGraph.generateData();
+//				smoother.setGraphData(closedFormGraph.getClosedFormGraphData());
+//
+//				if (!smoother.checkSmooth()) {
+//					closedFormResultsTextArea.append("Smoothing...\n");
+//					closedFormGraph.setStepsize(defaultStepsize / smoothingFactor);
+//					closedFormGraph.getClosedFormGraphData().clear();
+//					closedFormGraph.generateData();
+//					smoother.setGraphData(closedFormGraph.getClosedFormGraphData());
+//					closedFormResultsTextArea.append("Smoothing complete.\n");
+//				}
+//				//				System.out.println("Plotting graph");
+//				closedFormGraph.generateData();
+//				closedFormGraph.getDataset().addSeries(closedFormGraph.getSeries());
+//				closedFormGraph.getChartFrame().repaint();
+//			} else {
+//				solver.solve(0, true);
+////				rhandler.generateData();
+//				closedFormGraph.generateData();
+//				graph.setGraphData(solver.getGraphData());
+////				graph.setGraphData(rhandler.getGraphData());
+//				smoother.setGraphData(graph.getGraphData());
+//				if (!smoother.checkSmooth()) {
+//					if (graphBox.isSelected()) {
+//						resultsTextArea.append("Smoothing...\n");
+//					}
+//					if (closedFormGraphBox.isSelected()) {
+//						closedFormResultsTextArea.append("Smoothing...\n");
+//					}
+//					solver.setBound(2, defaultStepsize / smoothingFactor);
+////					rhandler.setStepsize(defaultStepsize / smoothingFactor);
+//					closedFormGraph.setStepsize(defaultStepsize / smoothingFactor);
+//					solver.solve(0, true);
+////					rhandler.generateData();
+//					closedFormGraph.generateData();
+//					graph.setGraphData(solver.getGraphData());
+////					graph.setGraphData(rhandler.getGraphData());
+//					smoother.setGraphData(graph.getGraphData());
+//					if (graphBox.isSelected()) {
+//						resultsTextArea.append("Smoothing complete.\n");
+//					}
+//					if (closedFormGraphBox.isSelected()) {
+//						closedFormResultsTextArea.append("Smoothing complete.\n");
+//					}
+//
+//				}
+//				closedFormGraph.generateData();
+//				graph.plot();
+//				closedFormGraph.plot();
+//				if (graph.getLastLocation() != null) {
+//					graph.getChartFrame().setLocation(graph.getLastLocation());
+//				}
+//				if (closedFormGraph.getLastLocation() != null) {
+//					closedFormGraph.getChartFrame().setLocation(closedFormGraph.getLastLocation());
+//				}
+//				graph.setCheckCounter(graph.getCheckCounter() + 1);
+//				closedFormGraph.setCheckCounter(closedFormGraph.getCheckCounter() + 1);
+//			}
+//		} catch (NumberIsTooSmallException e) {
+//			exceptionDialog.setVisible(true);
+//		}
+//	}
 
 	private void initGui() {
 
-		// set up all the objects we need to integrate into the gui	
+		// set up all the objects we need to integrate into the gui			
+		
 		RiccatiGraph graph = new RiccatiGraph();
 		this.graph = graph;
 		
@@ -244,6 +246,12 @@ public class GUI {
 //		closedFormGraph.setRhandler(rhandler);
 		closedFormGraph.setClosedFormFunction(closedFormFunction);
 
+		graphUpdater = new GraphUpdater(this);
+		graphUpdater.setClosedFormGraph(closedFormGraph);
+		graphUpdater.setGraph(graph);
+		graphUpdater.setSmoother(smoother);
+		graphUpdater.setSolver(solver);
+		
 		//set up all the swing components
 
 		JFrame frame = new JFrame();
@@ -522,7 +530,7 @@ public class GUI {
 					}
 				}
 				if (autoUpdateBox.isSelected()) {
-					updateGraph();
+					graphUpdater.updateGraph();
 				}
 
 			});
@@ -547,7 +555,7 @@ public class GUI {
 				maxAngleInput.requestFocus();
 			}
 			if (autoUpdateBox.isSelected()) {
-				updateGraph();
+				graphUpdater.updateGraph();
 			}
 			propertyChangeSupport.firePropertyChange("smoothingFactorEntered", smoothingFactorOld, smoothingFactor);
 
@@ -578,6 +586,12 @@ public class GUI {
 		});
 
 		propertyChangeSupport.addPropertyChangeListener("smoothingFactorEntered", (evt) -> smoothingFactorEntered = true);
+	
+		graphUpdater.getPropertyChangeSupport().addPropertyChangeListener("Smoothing num only", (evt) -> resultsTextArea.append("Smoothing...\n"));
+		graphUpdater.getPropertyChangeSupport().addPropertyChangeListener("Smoothing num only Complete", (evt) -> resultsTextArea.append("Smoothing complete.\n"));
+		graphUpdater.getPropertyChangeSupport().addPropertyChangeListener("Smoothing cf only", (evt) -> closedFormResultsTextArea.append("Smoothing...\n"));
+		graphUpdater.getPropertyChangeSupport().addPropertyChangeListener("Smoothing cf only Complete", (evt) -> closedFormResultsTextArea.append("Smoothing complete.\n"));
+		graphUpdater.getPropertyChangeSupport().addPropertyChangeListener("exception dialog set visible", (evt) -> exceptionDialog.setVisible(true));
 
 		smoothingFactorInput.addFocusListener(new FocusListener() {
 
@@ -618,7 +632,7 @@ public class GUI {
 				tMinInput.requestFocus();
 			}
 			if (autoUpdateBox.isSelected()) {
-				updateGraph();
+				graphUpdater.updateGraph();
 			}
 			propertyChangeSupport.firePropertyChange("maxAngleEntered", maxAngleOld, smoother.getMaxAngle());
 
@@ -671,7 +685,7 @@ public class GUI {
 
 		});
 
-		manualUpdateButton.addActionListener((e) -> updateGraph());
+		manualUpdateButton.addActionListener((e) -> graphUpdater.updateGraph());
 
 		Arrays.asList(false, true).forEach((max) -> {
 			JTextField input = max ? tMaxInput : tMinInput;
@@ -710,7 +724,7 @@ public class GUI {
 					}
 				}
 				if (autoUpdateBox.isSelected()) {
-					updateGraph();
+					graphUpdater.updateGraph();
 				}
 
 			});
@@ -727,6 +741,7 @@ public class GUI {
 				graph.setTmax(120);
 			}
 			if (graph.getCheckCounter() % 2 != 0) {
+				graphUpdater.setGraphBoxIsSelected(true);
 				try {
 //					if (rhandler.getGraphData() != null && graph.getGraphData() != null) {
 //						rhandler.getGraphData().clear();
@@ -736,6 +751,7 @@ public class GUI {
 						solver.getGraphData().clear();
 						graph.getGraphData().clear();
 					}
+					solver.setFlag(0, true);
 					solver.solve(0, true);
 //					rhandler.generateData();
 //					System.out.println("Actual size of dataset: " + rhandler.getGraphData().size());
@@ -766,6 +782,7 @@ public class GUI {
 					graph.getChartFrame().setLocation(graph.getLastLocation());
 				}
 			} else if (graph.getChartFrame() != null && graph.getCheckCounter() % 2 == 0) {
+				graphUpdater.setGraphBoxIsSelected(false);
 				graph.setLastLocation(graph.getChartFrame().getLocation());
 				graph.getChartFrame().dispose();
 				graph.setCheckCounter(graph.getCheckCounter() + 1);
@@ -793,6 +810,7 @@ public class GUI {
 				closedFormGraph.settMax(120);
 			}
 			if (closedFormGraph.getCheckCounter() % 2 != 0) {
+				graphUpdater.setClosedFormGraphBoxIsSelected(true);
 				if (closedFormGraph.getClosedFormGraphData() != null && closedFormGraph.getSeries() != null /*&& rhandler.getGraphData() != null*/) {
 					closedFormGraph.getSeries().clear();
 					closedFormGraph.getClosedFormGraphData().clear();
@@ -813,6 +831,7 @@ public class GUI {
 					closedFormGraph.getChartFrame().setLocation(closedFormGraph.getLastLocation());
 				}
 			} else if (closedFormGraph.getChartFrame() != null && closedFormGraph.getCheckCounter() % 2 == 0) {
+				graphUpdater.setClosedFormGraphBoxIsSelected(false);
 				closedFormGraph.setLastLocation(closedFormGraph.getChartFrame().getLocation());
 				closedFormGraph.getChartFrame().dispose();
 				closedFormGraph.setCheckCounter(closedFormGraph.getCheckCounter() + 1);
@@ -858,7 +877,7 @@ public class GUI {
 				equationLabel.setText("v'(t) = " + inputStrings[0] + " - " + inputStrings[1] + " [v(t)] - " + inputStrings[2] + " [v(t)]^2");
 			}
 			if (autoUpdateBox.isSelected()) {
-				updateGraph();
+				graphUpdater.updateGraph();
 			}
 			// ADD THIS TO MANUAL UPDATE PROCESS
 		});
@@ -868,7 +887,7 @@ public class GUI {
 			solver.setFlag(4, false);
 			solver.setFlag(3, true);
 			if (autoUpdateBox.isSelected()) {
-				updateGraph();
+				graphUpdater.updateGraph();
 			}
 		});
 
@@ -877,7 +896,7 @@ public class GUI {
 			solver.setFlag(3, false);
 			solver.setFlag(4, true);
 			if (autoUpdateBox.isSelected()) {
-				updateGraph();
+				graphUpdater.updateGraph();
 			}
 		});
 
@@ -892,7 +911,7 @@ public class GUI {
 				hInput.setText(" #: ");
 			}
 			if (autoUpdateBox.isSelected()) {
-				updateGraph();
+				graphUpdater.updateGraph();
 			}
 		});
 
@@ -942,5 +961,21 @@ public class GUI {
 
 		frame.setVisible(true);
 
+	}
+
+	public int getSmoothingFactor() {
+		return smoothingFactor;
+	}
+
+	public void setSmoothingFactor(int smoothingFactor) {
+		this.smoothingFactor = smoothingFactor;
+	}
+
+	public double getDefaultStepsize() {
+		return defaultStepsize;
+	}
+
+	public void setDefaultStepsize(double defaultStepsize) {
+		this.defaultStepsize = defaultStepsize;
 	}
 }

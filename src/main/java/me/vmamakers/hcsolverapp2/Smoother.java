@@ -7,6 +7,10 @@ public class Smoother {
 	private HashMap<Double, Double> graphData;
 	private double maxAngle = 10;
 	private boolean isSmooth = false;
+	
+	public Smoother() {
+		graphData = new HashMap<Double, Double>(100);
+	}
 
 	public boolean checkSmooth() {
 		ArrayList<Double> angleArrayList = new ArrayList<Double>();

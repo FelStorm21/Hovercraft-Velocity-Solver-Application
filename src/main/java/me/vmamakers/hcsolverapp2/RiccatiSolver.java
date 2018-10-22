@@ -30,6 +30,7 @@ public class RiccatiSolver implements FixedStepHandler {
 		dragEquation = new DragCoefficientDiffEq(constants, regCoeff);
 		bounds[2] = handlerStepsize;
 		handler = new StepNormalizer(bounds[2], this);
+		graphData = new HashMap<Double, Double>(100);
 	}
 	
 	@Override 

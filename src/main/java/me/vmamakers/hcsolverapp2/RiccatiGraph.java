@@ -33,8 +33,9 @@ public class RiccatiGraph {
 
 	protected PropertyChangeSupport propertyChangeSupport;
 
-	public RiccatiGraph() { //default constructor that sets interval to two minutes long
+	public RiccatiGraph() { 
 		propertyChangeSupport = new PropertyChangeSupport(this);
+		graphData = new HashMap<Double, Double>(100);
 	}
 
 	public void plot() {
